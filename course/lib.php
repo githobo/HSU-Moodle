@@ -1,4 +1,4 @@
-<?php  // $Id: lib.php,v 1.538.2.80 2010/02/25 10:16:15 stronk7 Exp $
+<?php  // $Id$
    // Library of useful functions
 
 

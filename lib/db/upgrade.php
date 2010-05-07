@@ -1,4 +1,4 @@
-<?PHP  //$Id: upgrade.php,v 1.154.2.77 2010/03/22 10:59:05 stronk7 Exp $
+<?PHP  //$Id$
 
 // This file keeps track of upgrades to Moodle.
 //

@@ -1,4 +1,4 @@
-<?PHP // $Id: moodle.php,v 1.141.2.83 2010/03/22 22:10:34 stronk7 Exp $
+<?PHP // $Id$
       // moodle.php - created with Moodle 1.7 beta + (2006101003)
 
 

@@ -1,4 +1,4 @@
-<?php // $Id: assign.php,v 1.63.2.17 2010/02/12 16:33:54 sam_marshall Exp $
+<?php // $Id$
       // Script to assign users to contexts
 
     require_once('../../config.php');

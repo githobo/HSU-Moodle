@@ -1,8 +1,8 @@
-<?php // $Id: continue.php,v 1.39.2.10 2009/11/02 17:01:07 tjhunt Exp $
+<?php // $Id$
 /**
  * Action for processing page answers by users
  *
- * @version $Id: continue.php,v 1.39.2.10 2009/11/02 17:01:07 tjhunt Exp $
+ * @version $Id$
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package lesson
  **/

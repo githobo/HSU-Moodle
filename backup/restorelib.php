@@ -1,4 +1,4 @@
-<?php //$Id: restorelib.php,v 1.283.2.96 2010/04/23 17:36:52 stronk7 Exp $
+<?php //$Id$
     //Functions used in restore
 
     require_once($CFG->libdir.'/gradelib.php');

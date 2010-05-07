@@ -1,4 +1,4 @@
-<?php  // $Id: lib.php,v 1.87.2.17 2010/04/21 23:40:03 danmarsden Exp $
+<?php  // $Id$
 
 /**
 * Given an object containing all the necessary data,

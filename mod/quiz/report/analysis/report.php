@@ -1,4 +1,4 @@
-<?php  // $Id: report.php,v 1.41.2.9 2009/11/30 17:12:17 sam_marshall Exp $
+<?php  // $Id$
 
     require_once($CFG->libdir.'/tablelib.php');
 

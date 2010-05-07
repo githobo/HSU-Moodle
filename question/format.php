@@ -1,4 +1,4 @@
-<?php  // $Id: format.php,v 1.35.2.15 2009/11/19 10:46:40 skodak Exp $
+<?php  // $Id$
 /**
  * Base class for question import and export formats.
  *

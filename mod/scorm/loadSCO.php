@@ -1,4 +1,4 @@
-<?php  // $Id: loadSCO.php,v 1.33.4.11 2010/01/13 22:42:03 danmarsden Exp $
+<?php  // $Id$
     require_once('../../config.php');
     require_once('locallib.php');
 

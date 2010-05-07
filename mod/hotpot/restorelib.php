@@ -1,4 +1,4 @@
-<?PHP //$Id: restorelib.php,v 1.24.4.6 2010/03/15 10:16:00 gbateson Exp $
+<?PHP //$Id$
 //This php script contains all the stuff to restore hotpot mods
     //-----------------------------------------------------------
     // This is the "graphical" structure of the hotpot mod:

@@ -27,7 +27,7 @@
 /**
  * Contains the reknown class "t3lib_div" with general purpose functions
  *
- * $Id: class.t3lib_div.php,v 1.2.22.2 2009/11/19 10:10:50 skodak Exp $
+ * $Id$
  * Revised for TYPO3 3.6 July/2003 by Kasper Skaarhoj
  * XHTML compliant
  * Usage counts are based on search 22/2 2003 through whole source including tslib/
@@ -896,7 +896,7 @@ class t3lib_div {
 	 */
 	function danish_strtoupper($string)	{
 		$value = strtoupper($string);
-		return strtr($value, 'áéúíâêûôîæøåäöü', 'ÁÉÚÍÄËÜÖÏÆØÅÄÖÜ');
+		return strtr($value, 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½', 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½');
 	}
 
 	/**
@@ -904,13 +904,13 @@ class t3lib_div {
 	 * Only known characters will be converted, so don't expect a result for any character.
 	 * (DEPRECIATED: Works only for western europe single-byte charsets! Use t3lib_cs::specCharsToASCII() instead!)
 	 *
-	 * ä => ae, Ö => Oe
+	 * ï¿½ => ae, ï¿½ => Oe
 	 *
 	 * @param	string		String to convert.
 	 * @return	string
 	 */
 	function convUmlauts($str)	{
-		$pat  = array (	'/ä/',	'/Ä/',	'/ö/',	'/Ö/',	'/ü/',	'/Ü/',	'/ß/',	'/å/',	'/Å/',	'/ø/',	'/Ø/',	'/æ/',	'/Æ/'	);
+		$pat  = array (	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/',	'/ï¿½/'	);
 		$repl = array (	'ae',	'Ae',	'oe',	'Oe',	'ue',	'Ue',	'ss',	'aa',	'AA',	'oe',	'OE',	'ae',	'AE'	);
 		return preg_replace($pat,$repl,$str);
 	}
@@ -1653,7 +1653,7 @@ class t3lib_div {
 	 * @param	boolean		Wrap script element in linebreaks? Default is TRUE.
 	 * @return	string		The wrapped JS code, ready to put into a XHTML page
 	 * @author	Ingmar Schlecht <ingmars@web.de>
-	 * @author	René Fritz <r.fritz@colorcube.de>
+	 * @author	Renï¿½ Fritz <r.fritz@colorcube.de>
 	 */
 	function wrapJS($string, $linebreak=TRUE) {
 		if(trim($string)) {
@@ -3520,7 +3520,7 @@ class t3lib_div {
 	 * @param	string		Sub type like file extensions or similar. Defined by the service.
 	 * @param	mixed		List of service keys which should be exluded in the search for a service. Array or comma list.
 	 * @return	object		The service object or an array with error info's.
-	 * @author	René Fritz <r.fritz@colorcube.de>
+	 * @author	Renï¿½ Fritz <r.fritz@colorcube.de>
 	 */
 	function &makeInstanceService($serviceType, $serviceSubType='', $excludeServiceKeys=array())	{
 		global $T3_SERVICES, $T3_VAR, $TYPO3_CONF_VARS;

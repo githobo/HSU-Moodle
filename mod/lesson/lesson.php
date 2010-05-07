@@ -16,7 +16,7 @@
  *    move
  *    moveit
  *    updatepage
- * @version $Id: lesson.php,v 1.47.8.1 2009/11/21 23:49:44 skodak Exp $
+ * @version $Id$
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package lesson
  **/

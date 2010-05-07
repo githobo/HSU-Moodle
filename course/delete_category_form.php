@@ -1,4 +1,4 @@
-<?php  //$Id: delete_category_form.php,v 1.1.2.4 2009/09/26 16:23:34 skodak Exp $
+<?php  //$Id$
 
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir . '/questionlib.php');

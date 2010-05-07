@@ -1,4 +1,4 @@
-<?php // $Id: index.php,v 1.46.2.16 2009/12/16 00:51:28 andyjdavis Exp $
+<?php // $Id$
 /**
  * This page lists all the instances of quiz in a particular course
  *

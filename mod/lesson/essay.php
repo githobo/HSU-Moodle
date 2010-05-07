@@ -1,8 +1,8 @@
-<?php  // $Id: essay.php,v 1.9.2.1 2009/11/02 17:01:07 tjhunt Exp $
+<?php  // $Id$
 /**
  * Provides the interface for grading essay questions
  *
- * @version $Id: essay.php,v 1.9.2.1 2009/11/02 17:01:07 tjhunt Exp $
+ * @version $Id$
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package lesson
  **/

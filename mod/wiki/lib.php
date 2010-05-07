@@ -1,4 +1,4 @@
-<?php  // $Id: lib.php,v 1.53.2.9 2010/01/21 23:40:02 stronk7 Exp $
+<?php  // $Id$
 
 /// Library of functions and constants for module wiki
 /// (replace wiki with the name of your module and delete this line)

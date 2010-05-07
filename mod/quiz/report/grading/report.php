@@ -1,4 +1,4 @@
-<?php  // $Id: report.php,v 1.25.2.18 2009/11/02 17:08:05 tjhunt Exp $
+<?php  // $Id$
 /**
  * Quiz report to help teachers manually grade quiz questions that need it.
  *

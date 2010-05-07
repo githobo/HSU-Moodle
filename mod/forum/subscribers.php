@@ -1,4 +1,4 @@
-<?php  // $Id: subscribers.php,v 1.40.2.5 2009/11/30 17:12:17 sam_marshall Exp $
+<?php  // $Id$
 
     require_once("../../config.php");
     require_once("lib.php");

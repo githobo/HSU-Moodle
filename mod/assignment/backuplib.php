@@ -1,4 +1,4 @@
-<?php //$Id: backuplib.php,v 1.12.8.3 2009/08/13 09:35:40 mjollnir_ Exp $
+<?php //$Id$
     //This php script contains all the stuff to backup/restore
     //assignment mods
 

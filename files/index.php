@@ -1,4 +1,4 @@
-<?php // $Id: index.php,v 1.121.2.11 2009/09/28 18:57:25 skodak Exp $
+<?php // $Id$
 
 //  Manage all uploaded files in a course file area
 

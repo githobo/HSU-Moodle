@@ -1,4 +1,4 @@
-<?PHP  // $Id: lib.php,v 1.79.2.26 2010/03/15 10:15:59 gbateson Exp $
+<?PHP  // $Id$
 
 //////////////////////////////////
 /// CONFIGURATION settings

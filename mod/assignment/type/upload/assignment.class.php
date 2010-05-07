@@ -1,4 +1,4 @@
-<?php // $Id: assignment.class.php,v 1.32.2.17 2010/03/07 15:24:18 skodak Exp $
+<?php // $Id$
 require_once($CFG->libdir.'/formslib.php');
 
 define('ASSIGNMENT_STATUS_SUBMITTED', 'submitted'); // student thinks it is finished

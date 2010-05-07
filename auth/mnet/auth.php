@@ -1,4 +1,4 @@
-<?php // $Id: auth.php,v 1.27.2.20 2010/02/17 01:32:14 mjollnir_ Exp $
+<?php // $Id$
 
 /**
  * @author Martin Dougiamas

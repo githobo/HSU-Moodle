@@ -1,4 +1,4 @@
-<?php  // $Id: post_form.php,v 1.21.2.7 2009/09/26 16:25:48 skodak Exp $
+<?php  // $Id$
 
 require_once($CFG->libdir.'/formslib.php');
 

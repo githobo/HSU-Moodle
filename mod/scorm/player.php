@@ -1,4 +1,4 @@
-<?PHP  // $Id: player.php,v 1.34.2.12 2009/12/18 06:42:38 danmarsden Exp $
+<?PHP  // $Id$
 
 /// This page prints a particular instance of aicc/scorm package
 

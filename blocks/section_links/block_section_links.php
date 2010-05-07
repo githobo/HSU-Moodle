@@ -1,4 +1,4 @@
-<?PHP //$Id: block_section_links.php,v 1.25.2.4 2009/12/18 03:01:36 dongsheng Exp $
+<?PHP //$Id$
 
 class block_section_links extends block_base {
 

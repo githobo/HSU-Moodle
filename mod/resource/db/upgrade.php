@@ -1,4 +1,4 @@
-<?php  //$Id: upgrade.php,v 1.5.2.3 2009/09/30 10:49:47 tjhunt Exp $
+<?php  //$Id$
 
 // This file keeps track of upgrades to 
 // the resource module

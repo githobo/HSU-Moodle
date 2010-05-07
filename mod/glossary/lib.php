@@ -1,4 +1,4 @@
-<?php  // $Id: lib.php,v 1.193.2.22 2009/11/22 12:43:10 skodak Exp $
+<?php  // $Id$
 
 /// Library of functions and constants for module glossary
 /// (replace glossary with the name of your module and delete this line)

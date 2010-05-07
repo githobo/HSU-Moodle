@@ -1,4 +1,4 @@
-<?php // $Id: post.php,v 1.154.2.18 2009/10/13 20:53:57 skodak Exp $
+<?php // $Id$
 
 //  Edit and save a new post to a discussion
 

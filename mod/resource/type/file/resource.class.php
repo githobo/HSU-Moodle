@@ -1,4 +1,4 @@
-<?php // $Id: resource.class.php,v 1.71.2.31 2009/11/25 06:36:19 dongsheng Exp $
+<?php // $Id$
 
 /**
 * Extend the base resource class for file resources

@@ -1,4 +1,4 @@
-<?php // $Id: index.php,v 1.286.2.34 2009/11/24 04:04:20 moodler Exp $
+<?php // $Id$
 
 /// Check that config.php exists, if not then call the install script
     if (!file_exists('../config.php')) {

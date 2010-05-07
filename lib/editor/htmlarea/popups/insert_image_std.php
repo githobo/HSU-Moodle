@@ -1,4 +1,4 @@
-<?php // $Id: insert_image_std.php,v 1.5.8.2 2009/06/09 04:58:39 jonathanharker Exp $
+<?php // $Id$
     require("../../../../config.php");
 
     $id = optional_param('id', SITEID, PARAM_INT);

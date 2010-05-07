@@ -1,4 +1,4 @@
-<?php // $Id: security.php,v 1.21.2.15 2010/03/19 07:58:52 skodak Exp $
+<?php // $Id$
 
 if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 

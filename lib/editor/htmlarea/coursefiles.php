@@ -1,4 +1,4 @@
-<?php // $Id: coursefiles.php,v 1.13.8.6 2009/06/09 04:58:38 jonathanharker Exp $
+<?php // $Id$
 
 //  Manage all uploaded files in a course file area
 

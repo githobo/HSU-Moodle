@@ -1,4 +1,4 @@
-<?php  // $Id: questiontype.php,v 1.41.2.21 2010/01/14 21:56:42 pichetp Exp $
+<?php  // $Id$
 
 ///////////////////
 /// MULTIANSWER /// (Embedded - cloze)

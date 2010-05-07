@@ -1,4 +1,4 @@
-<?php   // $Id: moodle.org.php,v 1.1.2.3 2009/12/30 14:07:31 wildgirl Exp $
+<?php   // $Id$
 
 $string['aboutdemosite'] = 'Our demonstration site is a full Moodle site with some sample courses that you can try as a teacher, student or even an administrator.  Don\'t worry about making a mess, the whole site is reset to a clean state every hour.';
 $string['aboutdemositetitle'] = 'Demonstration site';

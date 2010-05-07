@@ -1,4 +1,4 @@
-<?PHP // $Id: data.php,v 1.53.4.21 2009/09/27 18:07:53 skodak Exp $
+<?PHP // $Id$
 
 $string['action'] = 'Action';
 $string['add'] = 'Add entry';

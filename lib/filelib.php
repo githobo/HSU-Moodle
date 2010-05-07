@@ -1,4 +1,4 @@
-<?php //$Id: filelib.php,v 1.50.2.32 2009/11/24 08:44:43 moodler Exp $
+<?php //$Id$
 
 define('BYTESERVING_BOUNDARY', 's1k2o3d4a5k6s7'); //unique string constant
 

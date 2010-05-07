@@ -1,8 +1,8 @@
-<?php  // $Id: lib.php,v 1.41.2.11 2009/10/27 11:24:56 nicolasconnault Exp $
+<?php  // $Id$
 /**
  * Standard library of functions and constants for lesson
  *
- * @version $Id: lib.php,v 1.41.2.11 2009/10/27 11:24:56 nicolasconnault Exp $
+ * @version $Id$
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package lesson
  **/

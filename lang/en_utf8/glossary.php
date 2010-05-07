@@ -1,4 +1,4 @@
-<?PHP // $Id: glossary.php,v 1.8.2.5 2009/08/17 16:45:36 arborrow Exp $
+<?PHP // $Id$
       // glossary.php - created with Moodle 1.7 beta + (2006101003)
 
 

@@ -1,4 +1,4 @@
-<?php // $Id: lib.php,v 1.16.2.14 2010/02/18 03:11:52 mjollnir_ Exp $
+<?php // $Id$
 /**
  * Library functions for mnet
  *

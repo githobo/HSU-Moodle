@@ -1,4 +1,4 @@
-<?php  // $Id: questiontype.php,v 1.32.2.12 2010/02/23 12:47:07 tjhunt Exp $
+<?php  // $Id$
 
 /////////////
 /// MATCH ///

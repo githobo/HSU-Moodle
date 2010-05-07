@@ -1,4 +1,4 @@
-<?php // $Id: uploadpicture_form.php,v 1.1.2.2 2009/06/16 09:07:57 jerome Exp $
+<?php // $Id$
     require_once $CFG->libdir.'/formslib.php';
 
     class admin_uploadpicture_form extends moodleform {
