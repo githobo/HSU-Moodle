@@ -299,17 +299,11 @@ function scorm_get_scoes($id,$organisation=false) {
 function scorm_insert_track($userid,$scormid,$scoid,$attempt,$element,$value) {
     $id = null;
     if ($track = get_record_select('scorm_scoes_track',"userid='$userid' AND scormid='$scormid' AND scoid='$scoid' AND attempt='$attempt' AND element='$element'")) {
-<<<<<<< HEAD
-        $track->value = addslashes_js($value);
-        $track->timemodified = time();
-        $id = update_record('scorm_scoes_track',$track);
-=======
         if ($element != 'x.start.time' ) { //don't update x.start.time - keep the original value.
             $track->value = addslashes_js($value);
             $track->timemodified = time();
             $id = update_record('scorm_scoes_track',$track);
         }
->>>>>>> vanilla/MOODLE_19_STABLE
     } else {
         $track->userid = $userid;
         $track->scormid = $scormid;
@@ -516,11 +510,7 @@ function scorm_grade_user($scorm, $userid, $time=false) {
             return scorm_grade_user_attempt($scorm, $userid, 1, $time);
         break;
         case LASTATTEMPT:
-<<<<<<< HEAD
-            return scorm_grade_user_attempt($scorm, $userid, scorm_get_last_attempt($scorm->id, $userid), $time);
-=======
             return scorm_grade_user_attempt($scorm, $userid, scorm_get_last_completed_attempt($scorm->id, $userid), $time);
->>>>>>> vanilla/MOODLE_19_STABLE
         break;
         case HIGHESTATTEMPT:
             $maxscore = 0;
@@ -594,8 +584,6 @@ function scorm_get_last_attempt($scormid, $userid) {
     }
 }
 
-<<<<<<< HEAD
-=======
 function scorm_get_last_completed_attempt($scormid, $userid) {
 /// Find the last attempt number for the given user id and scorm id
     if ($lastattempt = get_record('scorm_scoes_track', 'userid', $userid, 'scormid', $scormid, 'value', 'completed', 'max(attempt) as a')) {
@@ -607,7 +595,6 @@ function scorm_get_last_completed_attempt($scormid, $userid) {
     }
 }
 
->>>>>>> vanilla/MOODLE_19_STABLE
 function scorm_course_format_display($user,$course) {
     global $CFG;
 
@@ -1173,14 +1160,11 @@ function scorm_reconstitute_array_element($sversion, $userdata, $element_name, $
     $current_sub = '';
     $count = 0;
     $count_sub = 0;
-<<<<<<< HEAD
 
-=======
     $scormseperator = '_';
     if ($sversion == 'scorm_13') { //scorm 1.3 elements use a . instead of an _
     	$scormseperator = '.';
     }
->>>>>>> vanilla/MOODLE_19_STABLE
     // filter out the ones we want
     $element_list = array();
     foreach($userdata as $element => $value){
@@ -1203,11 +1187,7 @@ function scorm_reconstitute_array_element($sversion, $userdata, $element_name, $
         }
         if (count($matches) > 0 && $current != $matches[1]) {
             if ($count_sub > 0) {
-<<<<<<< HEAD
-                echo '    '.$element_name.'_'.$current.'.'.$current_subelement.'._count = '.$count_sub.";\n";
-=======
                 echo '    '.$element_name.$scormseperator.$current.'.'.$current_subelement.'._count = '.$count_sub.";\n";
->>>>>>> vanilla/MOODLE_19_STABLE
             }
             $current = $matches[1];
             $count++;
@@ -1236,16 +1216,7 @@ function scorm_reconstitute_array_element($sversion, $userdata, $element_name, $
         // check the sub element type
         if (count($matches) > 0 && $current_subelement != $matches[1]) {
             if ($count_sub > 0) {
-<<<<<<< HEAD
-                if ($sversion == 'scorm_13') {
-                    echo '    '.$element_name.'.'.$current.'.'.$current_subelement.'._count = '.$count_sub.";\n";
-                }
-                else {
-                    echo '    '.$element_name.'_'.$current.'.'.$current_subelement.'._count = '.$count_sub.";\n";
-                }
-=======
                 echo '    '.$element_name.$scormseperator.$current.'.'.$current_subelement.'._count = '.$count_sub.";\n";
->>>>>>> vanilla/MOODLE_19_STABLE
             }
             $current_subelement = $matches[1];
             $current_sub = '';
@@ -1267,16 +1238,7 @@ function scorm_reconstitute_array_element($sversion, $userdata, $element_name, $
         echo '    '.$element.' = \''.$value."';\n";
     }
     if ($count_sub > 0) {
-<<<<<<< HEAD
-        if ($sversion == 'scorm_13') {
-            echo '    '.$element_name.'.'.$current.'.'.$current_subelement.'._count = '.$count_sub.";\n";
-        }
-        else {
-            echo '    '.$element_name.'_'.$current.'.'.$current_subelement.'._count = '.$count_sub.";\n";
-        }
-=======
         echo '    '.$element_name.$scormseperator.$current.'.'.$current_subelement.'._count = '.$count_sub.";\n";
->>>>>>> vanilla/MOODLE_19_STABLE
     }
     if ($count > 0) {
         echo '    '.$element_name.'._count = '.$count.";\n";

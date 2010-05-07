@@ -53,10 +53,7 @@
             $scorm->updatefreq = (int)backup_todb($info['MOD']['#']['UPDATEFREQ']['0']['#']);
             $scorm->maxattempt = (int)backup_todb($info['MOD']['#']['MAXATTEMPT']['0']['#']);
             $scorm->grademethod = (int)backup_todb($info['MOD']['#']['GRADEMETHOD']['0']['#']);
-<<<<<<< HEAD
-=======
             $scorm->whatgrade = (int)backup_todb($info['MOD']['#']['WHATGRADE']['0']['#']);
->>>>>>> vanilla/MOODLE_19_STABLE
             if ($restore->backup_version < 2005041500) {
                 $scorm->datadir = substr(backup_todb($info['MOD']['#']['DATADIR']['0']['#']),1);
             } else {
@@ -507,13 +504,7 @@
 
         //Get the discussions array
         $mapinfos = array();
-<<<<<<< HEAD
-        
-        if (!empty($info['MOD']['#']['SEQ_MAPINFO']['0']['#']['SEQ_MAPINF'])) {
-            $mapinfos = $info['MOD']['#']['SEQ_MAPINFO']['0']['#']['SEQ_MAPINF'];
-        }
 
-=======
         //backward compatibility with old backups.
         if (!empty($info['MOD']['#']['SEQ_MAPINFO']['0']['#']['SEQ_MAPINF'])) {
             $mapinfos = $info['MOD']['#']['SEQ_MAPINFO']['0']['#']['SEQ_MAPINF'];
@@ -522,7 +513,6 @@
         if (!empty($info['MOD']['#']['SEQ_MAPINFOS']['0']['#']['SEQ_MAPINFO'])) {
             $mapinfos = $info['MOD']['#']['SEQ_MAPINFOS']['0']['#']['SEQ_MAPINFO'];
         }
->>>>>>> vanilla/MOODLE_19_STABLE
         
         for($i = 0; $i < sizeof($mapinfos); $i++) {
             $map_info = $mapinfos[$i];
