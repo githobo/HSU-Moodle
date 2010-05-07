@@ -1,0 +1,312 @@
+<?php // $Id: email.html,v 2.5 2008/02/15 09:53:43 pcali1 Exp $
+
+/**
+ * email.html - Prints the email form for Quickmail
+ *
+ * @Original author Mark Nielsen, updated by Bibek Bhattarai and Wen Hao Chuang
+ * @version $Id: email.html,v 2.01 2007/04/05 09:33:43 wenhaochuang Exp $
+ * @package quickmailv2 (enhanced quickmail for large classes)
+ **/
+ 
+/**
+ * Updated features:
+ *	- Replaces checkbox with selection list for effective usability in case of larger classes
+ *  - Added external email client feature
+ *  - Added a help button to explain external email client
+ *  - Removed group mode functionality
+ *  - Removed email log on the server side. We allow users to use external email client so that they could keep a record
+ *  - but we do not want all these logs exhaust our precious server space as we have many quickmail users
+ **/ 
+
+/**
+ *   Edited by: Philip Cali
+ *   Date: 2/15/2008
+ *   Louisiana State University
+ *   
+ *   - Added role filters and group selections
+ *   - Can send email with no message text
+ *   - Can add multiple attachments
+ *   - Can choose whether or not to receive receipts
+ **/
+
+?>
+<!-- link to javascript in selection.js -->
+<script language="JavaScript" src="selection.js"></script>
+<script language="Javascript" src="attachment.js"></script>
+<!-- calls function java script createListObjects every time theform is loaded -->
+
+<!-- Call java script function createListObject every time the form is re-loaded !-->
+<form name="theform" method="post" action="email.php" enctype="multipart/form-data">
+<table border="0" cellpadding="5" id="maintable">
+<tr>
+  <td colspan="2" align="right">
+    <?php
+        if ($quickmail->check_permission('block/quickmail:cansend', CONTEXT_COURSE, $course)) {
+        echo '<a href="emaillog.php?id='. $course->id . '&amp;instanceid='. $instance->id.'">'. get_string('emailhistory', 'block_quickmail'). '</a>';
+        }    
+  ?>
+  </td>
+</tr>
+<tr>
+  <td align="right"><b>From:</b></td>
+  <td align="left"><?php echo $USER->email; ?></td>
+</tr>
+<tr valign="top">
+    <tr><td align="right" width="200"></td></tr>
+    <td align="right"><div align="center"></div></td>
+    
+    <td width = "200">
+    <table width="200"><tr><td align="left" width="200"><div align="right"><strong><?php print_string('to', 'block_quickmail'); ?></strong></div></td></tr>
+    <tr>
+    <td width="250">
+        <div align="left">
+          <!-- Populate mailto list from $mail_list that stored list of users to be emailed variable -->
+		  <select name="mail_to" size="31" multiple id="mail_to" style="width:250px">
+			<?php
+				foreach($mail_list as $id) { 
+          			$id = stripslashes($id);
+					$id = str_replace("\"","",$id);
+					if($id != ""){
+                     $mail_groups = array();
+                     $mail_groups = $groupmembers_to_groupid[$id];
+                     if (!$mail_groups){
+                         $mail_group = new stdClass();
+                         $mail_group->id = 0;
+                         $mail_group->name = get_string('nosection', 'block_quickmail');
+                         $mail_groups[] = $group;
+                     }
+                     $groupsid = '';
+                     $groups_name = '';
+                     foreach ($mail_groups as $group) {
+                         $groupsid .= '' . $group->id . ',';
+                         $groups_name .= '' . $group->name . ',';
+                     }
+                     
+                    $user_roles = '';
+                    foreach ($roles_to_userid[$user->id] as $role) {
+                        $user_roles .= $role->shortname . ',';
+                    }
+ 
+                     echo '<option value="'.$id.' '. $courseusers[$id]->email.' '. $groupsid . ' '.'' .'">'.
+                             fullname($courseusers[$id], true).' ('. trim($groups_name, ",").')</option>';
+
+					}
+          		}				
+       		?>
+		</select>
+        </div></td>
+        </tr></table></td>
+    <td width="75">
+		<div align="center" margin-top="10px">
+          	<p><input type = "button" id="add" onClick="add_user()" style="width:100px;" value="<?php echo $THEME->larrow?> Add" title="Add selected user to selected recipients list" />
+          	</p>
+          	<p><input type = "button" id="remove" onClick="remove_user()" style="width:100px;" value="Remove <?php echo $THEME->rarrow?>" title="Remove selected users from selected recipients list"/>
+          	</p>
+          	<p><input type = "button" id="addall" onClick="addAll()" style="width:100px;" value="Add all" title="Add all users from selected recipients list"/></p>
+          	<p><input type = "button" id="removeall" onClick="removeAll()" style="width:100px;" value="Remove all" title="Add all users from selected recipients list"/></p>          	
+		</div></td>
+    <td width="300">
+    <table width="250">
+    
+    <!-- Creates sections for role selection-->
+    <tr><td align="right" width="250"><div align="right"><strong><?php print_string('rolefilter', 'block_quickmail'); ?></strong></div></td></tr>
+    <tr>
+        <td width="250"><div align="right">
+            <select id="roles" onchange="special_select_users()" style="width:250px">
+            <?php
+                $no_filter = get_string('no_filter', 'block_quickmail');
+                echo "<option value=\"none\" selected=\"selected\">$no_filter</option>";
+                foreach($quickmail->grab_roles() as $role_shortname => $role_name) {
+                    echo '<option value="'. $role_shortname .'">'.$role_name.'s only</option>';
+                }
+            ?>
+            </select></div>
+        </td>
+    </tr>
+
+    <tr><td align="right" width="250"><div align="right"><strong><?php print_string('potentialgroups', 'block_quickmail'); ?></strong></div></td></tr>
+<tr>
+<td width="250"><div align="right">
+<!-- Populate members list from $groups that stores list of groups in the course -->
+      
+    
+      <select name="groups" size="5" multiple id="groups" onchange="special_select_users()" style="width:250px">
+       <?php
+         foreach($groups as $group) { 
+                    echo '<option value="'.$group->id.' group">'. $group->name .'</option>';
+         }
+         //Have this option for those courses with a ton of people not in sections
+         echo '<option value="0 group">'. get_string('nosection', 'block_quickmail') .'</option>'
+     ?>       
+      </select>
+
+    </div></td></tr>
+     <tr><td align="right" width="250"><div align="right"><strong><?php print_string('potentialreceipent', 'block_quickmail'); ?></strong></div></td></tr>
+    <tr><td width="250"><div align="right">
+  
+      <!-- Populate members list from $courseusers that stores list of users in the course -->		  
+	  <select name="members" size="20" multiple id="members" style="width:250px">
+      <?php
+		foreach($courseusers as $user) { 
+			$show = true;
+			//if the id already exists in mail_list id then do not display
+			foreach($mail_list as $id){
+				$id = stripslashes($id);
+				$id = str_replace("\"","",$id);
+				if($id == $user->id){
+					$show = false;
+				}						
+			}
+			if($show){
+                    $groups = array();
+                    $groups = $groupmembers_to_groupid[$user->id];
+                    if (!$groups){
+                        $group = new stdClass();
+                        $group->id = 0;
+                        $group->name = get_string('nosection', 'block_quickmail');
+                        $groups[] = $group;
+                    }
+                    $groupsid = '';
+                    $groups_name = '';
+                    foreach ($groups as $group) {
+                        $groupsid .= '' . $group->id . ',';
+                        $groups_name .= '' . $group->name . ',';
+                    }                     
+
+                    $user_roles = '';
+                    foreach ($roles_to_userid[$user->id] as $role) {
+                        $user_roles .= $role->shortname . ',';
+                    }
+                    
+                    echo '<option value="'.$user->id.' '.$user->email.' '. $groupsid . ' '. $user_roles .'">'. 
+                            fullname($user, true).' ('. trim($groups_name, ",").')</option>';
+                }
+		    }
+      ?>          
+	  </select>
+    </div></td></tr></table></td>
+</tr>
+<!--<tr valign="top">
+  <td align="right"></td>
+  <td colspan="3">
+  	<input type = "button" id="mailto" onClick="mail_to_ext_client()" value="Use external email client to send this message"/>
+  <?php
+      helpbutton('extemail', 'moodle', true, true);
+      echo '<br />';
+  ?>
+  </td>
+</tr>
+-->
+
+
+<tr>
+    <td align="right" nowrap="nowrap">
+        <strong><?php print_string('attachmentoptional', 'block_quickmail'); ?>(s):</strong>
+    </td>
+</tr>
+
+<tr valign="top" id="attach_1row">
+    <td align="right" nowrap="nowrap">
+    </td>
+    <td colspan="2">
+    <?php
+            $maxbytes = get_max_upload_file_size($CFG->maxbytes, $course->maxbytes);
+            echo '<input type="hidden" name="MAX_FILE_SIZE" value="'.$maxbytes.'" />';
+            echo '<input id="attach_1" type="file" name="attach_1" size="45" alt="'.get_string('attachmentalt', 'block_quickmail').'" onchange="javascript:create_new_attachment(\'attach_1\')"/> ';
+        //}
+    ?>
+    </td>
+</tr>
+
+<tr>
+    <td></td>
+    <td colspan="2">
+        <?php
+            echo '<b><font color= color= color="#000000">';
+			print_string('maxattachmentsize', 'block_quickmail'); echo ': 10MB'; //display_size($maxbytes);
+			echo'<br>';
+			//print_string('useextclient','block_quickmail');
+			echo '</b></font>';
+        ?>
+    </td>
+</tr>
+
+<tr valign="top">
+    <td align="right"><b><?php print_string('subject', 'forum'); ?>:</b></td>
+    <td colspan="3">
+        <input type="text" name="subject" size="80" value="<?php echo $form->subject; ?>" />
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right"><b>
+     <?php print_string('message', 'forum'); ?>:</b></td>
+    <td colspan="3" rowspan="2" align="left">
+    <?php print_textarea($usehtmleditor, 25, 65, 630, 400, 'message', $form->message); ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" valign="center" nowrap="nowrap">
+        <font size="2">
+            <?php
+                helpbutton('reading', get_string('helpreading'), 'moodle', true, true);
+                echo '<br />';
+                helpbutton('writing', get_string('helpwriting'), 'moodle', true, true);
+                echo '<br />';
+                if ($usehtmleditor) {
+                   helpbutton('richtext', get_string('helprichtext'), 'moodle', true, true);
+                } else {
+                   emoticonhelpbutton('theform', 'message');
+                } 
+            ?>
+        </font>
+    </td>
+</tr>
+
+<!-- Hiding format choice option from users as it is not applicable for us -->
+<!--<tr valign="top">
+    <td align="right"><b><?php print_string('formattexttype'); ?>:</b></td>
+    <td colspan="3">
+    <?php 
+        if ($usehtmleditor) {   /// Trying this out for a while
+            print_string('formathtml');
+            echo '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
+        } else {
+            choose_from_menu(format_text_menu(), 'format', $form->format, '');
+        }
+        helpbutton('textformat', get_string('helpformatting'));
+     ?>
+    </td>
+</tr>-->
+<?php 
+ 	echo '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
+?>
+
+
+
+<tr>
+    <td align="right" nowrap="nowrap"><strong><?php echo get_string('receipts', 'block_quickmail')?>:</strong></td>
+    <td>
+       <?php
+         echo get_string('no') . ' <input type="radio" name="receive_receipt" checked="yes" value="0"/>';
+         echo get_string('yes') . ' <input type="radio" name="receive_receipt" value="1"/>';
+       ?>
+    </td>
+</tr>
+
+<tr>
+    <td align="center" colspan="4">
+	<input type="hidden" name="mailuser" id="mailuser" value=""/>
+    <input type="hidden" name="attachids" id="attachids" value="attach_1"/> <!-- Keeps track of all the attachment field-->
+    <input type="hidden" name="sesskey" value="<?php echo $USER->sesskey; ?>" />
+	<input type="hidden" name="fromemail" value="<?php echo $USER->email; ?>" id="fromemail" />	
+    <input type="hidden" name="id" value="<?php echo $course->id; ?>" />
+    <input type="hidden" name="instanceid" value="<?php echo $instance->id; ?>" />
+    <input type="submit" name="cancel" value="<?php print_string('cancel') ?>" />
+    <input type="submit" name="sendemail" value="<?php print_string('sendemail', 'block_quickmail') ?>" onClick = "updateList()"/>
+    </td>
+</tr>
+</table>
+</form>
+<script language="Javascript">
+    createListObjects();
+</script>

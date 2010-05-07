@@ -1,0 +1,40 @@
+8
+
+dir
+792
+https://svn.its.lsu.edu/svn/moodle/trunk/mr_current/blocks/quickmail/lang/ja_utf8
+https://svn.its.lsu.edu/svn/moodle
+
+
+
+2009-04-14T12:45:27.700178Z
+792
+rrusso
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+a7480b67-5d3f-0410-8b3b-f348083f6f35
+
+block_quickmail.php
+file
+
+
+
+
+2009-04-14T12:53:38.000000Z
+da766e1fce2c00478c8ff6c8037b8183
+2009-04-14T12:45:27.700178Z
+792
+rrusso
+
