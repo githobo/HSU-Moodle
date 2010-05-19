@@ -224,7 +224,8 @@
     }
 
     // Get all the courses the user is able to restore to
-    $mycourses = get_user_courses_bycap($USER->id, 'moodle/site:restore', $accessinfo, true, 'c.sortorder ASC',  array('id', 'fullname', 'shortname', 'visible'));
+    //HSU addition of category to limit courses returned
+    $mycourses = get_user_courses_bycap($USER->id, 'moodle/site:restore', $accessinfo, true, 'c.sortorder ASC',  array('id', 'fullname', 'shortname', 'visible'), 0, $restore->restore_restorecatto);
 
     // Calculate if the user can create courses
     $cancreatecourses = user_can_create_courses();

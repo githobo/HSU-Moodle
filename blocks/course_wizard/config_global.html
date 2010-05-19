@@ -1,0 +1,58 @@
+<div class="course_wizard">
+
+    <h3><?php print_string('menuitems', 'block_course_wizard');?>:</h3>
+
+    <p><?php
+        if(isset($CFG->block_course_wizard_menu_items)) {
+        $menuitems = explode(',',$CFG->block_course_wizard_menu_items);
+        } else {
+        $menuitems = array('cwback', 'cwcross', 'cwshow', 'cwrest');
+        }
+        ?>
+        <input type="hidden" name="block_course_wizard_menu_items[0]" value="0"/>
+        <input type="checkbox" name="block_course_wizard_menu_items[0]" value="cwback" <?php if (in_array('cwback', $menuitems)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('cwbackup', 'block_course_wizard');?><br/>
+        <input type="hidden" name="block_course_wizard_menu_items[1]" value="0"/>
+        <input type="checkbox" name="block_course_wizard_menu_items[1]" value="cwcross" <?php if (in_array('cwcross', $menuitems)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('cwcrosslist', 'block_course_wizard');?><br/>
+        <input type="hidden" name="block_course_wizard_menu_items[2]" value="0"/>
+        <input type="checkbox" name="block_course_wizard_menu_items[2]" value="cwshow" <?php if (in_array('cwshow', $menuitems)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('cwshowhide', 'block_course_wizard');?><br/>
+        <input type="hidden" name="block_course_wizard_menu_items[3]" value="0"/>
+        <input type="checkbox" name="block_course_wizard_menu_items[3]" value="cwrest" <?php if (in_array('cwrest', $menuitems)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('cwrestore', 'block_course_wizard');?><br/>
+    </p>
+
+
+</div>
+
+<div class="course_wizard">
+    <h3>Instructor Visibility:</h3>
+
+    <h4><?php print_string('cwbackup', 'block_course_wizard');?>:</h4>
+    <?php
+    if(isset($CFG->block_course_wizard_visibility)) {
+    $visibility = explode(',',$CFG->block_course_wizard_visibility);
+    } else {
+    $visibility = array('cwback', 'cwcross', 'cwshow', 'cwrest');
+    }
+    ?>
+    <input type="hidden" name="block_course_wizard_visibility[0]" value="0"/>
+    <input type="radio" name="block_course_wizard_visibility[0]" value="cwback" <?php if (in_array('cwback', $visibility)) { echo 'checked="checked"'; } else {echo '';} ?>/>Allow<br/>
+    <input type="radio" name="block_course_wizard_visibility[0]" value="noback" <?php if (in_array('noback', $visibility)) { echo 'checked="checked"'; } else {echo '';} ?>/>Deny<br/>
+
+    <h4><?php print_string('cwcrosslist', 'block_course_wizard');?>:</h4>
+    <input type="hidden" name="block_course_wizard_visibility[1]" value="0"/>
+    <input type="radio" name="block_course_wizard_visibility[1]" value="cwcross" <?php if (in_array('cwcross', $visibility)) { echo 'checked="checked"'; } else {echo '';} ?>/>Allow<br/>
+    <input type="radio" name="block_course_wizard_visibility[1]" value="nocross" <?php if (in_array('nocross', $visibility)) { echo 'checked="checked"'; } else {echo '';} ?>/>Deny<br/>
+
+    <h4><?php print_string('cwshowhide', 'block_course_wizard');?>:</h4>
+    <input type="hidden" name="block_course_wizard_visibility[2]" value="0"/>
+    <input type="radio" name="block_course_wizard_visibility[2]" value="cwshow" <?php if (in_array('cwshow', $visibility)) { echo 'checked="checked"'; } else {echo '';} ?>/>Allow<br/>
+    <input type="radio" name="block_course_wizard_visibility[2]" value="noshow" <?php if (in_array('noshow', $visibility)) { echo 'checked="checked"'; } else {echo '';} ?>/>Deny<br/>
+    <h4><?php print_string('cwrestore', 'block_course_wizard');?>:</h4>
+    <input type="hidden" name="block_course_wizard_visibility[3]" value="0"/>
+    <input type="radio" name="block_course_wizard_visibility[3]" value="cwrest" <?php if (in_array('cwrest', $visibility)) { echo 'checked="checked"'; } else {echo '';} ?>/>Allow<br/>
+    <input type="radio" name="block_course_wizard_visibility[3]" value="norest" <?php if (in_array('norest', $visibility)) { echo 'checked="checked"'; } else {echo '';} ?>/>Deny<br/>
+
+</div>
+
+<div class="course_wizard_button">
+    <input type="submit" value="<?php print_string('savechanges') ?>">
+</div>

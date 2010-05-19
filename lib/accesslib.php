@@ -970,8 +970,8 @@ function require_capability($capability, $context, $userid=NULL, $doanything=tru
  * @return array $courses - ordered array of course objects - see notes above
  *
  */
-function get_user_courses_bycap($userid, $cap, $accessdata, $doanything, $sort='c.sortorder ASC', $fields=NULL, $limit=0) {
-
+function get_user_courses_bycap($userid, $cap, $accessdata, $doanything, $sort='c.sortorder ASC', $fields=NULL, $limit=0, $category=NULL) {
+    //HSU addition of category to narrow courses returned
     global $CFG;
 
     // Slim base fields, let callers ask for what they need...
@@ -995,6 +995,13 @@ function get_user_courses_bycap($userid, $cap, $accessdata, $doanything, $sort='
         $sort = "ORDER BY $sort";
     }
 
+    //HSU addition to limit by category
+    if (!is_null($category)) {
+        $categorylimit = "WHERE c.category = " . $category . " ";
+    } else {
+        $categorylimit = '';
+    }
+
     $sysctx = get_context_instance(CONTEXT_SYSTEM);
     if (has_capability_in_accessdata($cap, $sysctx, $accessdata, $doanything)) {
         //
@@ -1011,7 +1018,8 @@ function get_user_courses_bycap($userid, $cap, $accessdata, $doanything, $sort='
                   ON c.category=cc.id
                 JOIN {$CFG->prefix}context ctx 
                   ON (c.id=ctx.instanceid AND ctx.contextlevel=".CONTEXT_COURSE.")
-                $sort ";
+                $categorylimit
+                $sort ";    //HSU addition of category limit to narrow results
         $rs = get_recordset_sql($sql);
     } else {
         //
