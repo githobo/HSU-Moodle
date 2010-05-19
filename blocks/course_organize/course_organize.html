@@ -1,0 +1,86 @@
+<script language="javascript" type="text/javascript">
+  
+  function moveUp(theForm) {
+  	
+  	var holdValue;
+  	var holdName;
+  	var selLength = theForm.length;
+  	
+  	for(i = 0; i < selLength; i++) {
+  		if(theForm.options[i].selected) {
+			holdValue = theForm.options[i-1].value;
+			holdName = theForm.options[i-1].text;
+			theForm.options[i-1].value = theForm.options[i].value;
+			theForm.options[i-1].text = theForm.options[i].text;
+			theForm.options[i].value = holdValue;
+			theForm.options[i].text = holdName;
+			theForm.options[i-1].selected = true;
+			theForm.options[i].selected = false;
+			i = selLength;
+  		}
+  	}
+  }
+  
+  function moveDown(theForm) {
+  	
+  	var holdValue;
+  	var holdName;
+  	var selLength = theForm.length;
+  	
+  	for(i = 0; i < selLength; i++) {
+  		if(theForm.options[i].selected) {
+			holdValue = theForm.options[i+1].value;
+			holdName = theForm.options[i+1].text;
+			theForm.options[i+1].value = theForm.options[i].value;
+			theForm.options[i+1].text = theForm.options[i].text;
+			theForm.options[i].value = holdValue;
+			theForm.options[i].text = holdName;
+			theForm.options[i+1].selected = true;
+			theForm.options[i].selected = false;
+			i = selLength;
+  		}
+  	}
+  }
+  
+  function saveCourses() {
+  	testElement = document.getElementById("testIt");
+  	classOptions = document.getElementById("classes");
+  	for(var i = 0; i < classOptions.length; i++) {
+	   	hiddenValue = document.createElement("input");
+	   	hiddenValue.setAttribute("type", "hidden");
+	   	hiddenValue.setAttribute("name", "classOrder[]");
+	   	hiddenValue.setAttribute("value", classOptions.options[i].value);
+	   	testElement.appendChild(hiddenValue);
+  	}
+  }
+  
+</script>
+<div style="text-align:center;">
+<form action="course_organize.php" method="POST" name="testMe">
+<table style="margin-left:auto;margin-right:auto" cellpadding="5" cellspacing="0" border="0">
+  <tr>
+    <td valign="top">
+	 <select name="classes[]" id="classes" multiple="multiple" size="20" style="width: 350px;">
+	 <?php
+	   foreach($courses as $course) {
+	   	  echo '<option value="'.$course->id.'">'.$course->fullname.'</option>';
+	   }
+	 ?>
+	 </select>
+	 <td valign="center">
+ 		<input type="button" value="UP" onclick="moveUp(this.form.classes);" />
+ 		<br />
+ 		<input type="button" value="DOWN" onclick="moveDown(this.form.classes);" />
+ 	 </td>
+     <input type="hidden" name="userid" value="<?php echo $userid; ?>">
+   </tr>
+   <tr>
+   <td colspan="2" align="left">
+	 <div id="testIt" />
+	 <input type="button" value="Save Courses" onclick="saveCourses();document.testMe.submit();">
+	 <input name="cancelbutton" value="Back to MyHSU" type="button" onclick="cancel_redirect();" />
+   </td>
+   
+   </tr>
+</table>
+</form>

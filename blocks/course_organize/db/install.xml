@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+  <XMLDB PATH="blocks/course_organize/db" VERSION="20090623" COMMENT="XMLDB file for Moodle blocks/course_organize" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+   >
+    <TABLES>
+	  <TABLE NAME="block_course_organize" COMMENT="Configuration table for Course Organizer block.">
+		<FIELDS>
+		  <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="userid"/>
+		  <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="User ID field." PREVIOUS="id" NEXT="classorder"/>
+		  <FIELD NAME="classorder" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Course order." PREVIOUS="userid"/>
+		</FIELDS>
+		<KEYS>
+		  <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+		</KEYS>
+	  </TABLE>
+	</TABLES>
+  </XMLDB>

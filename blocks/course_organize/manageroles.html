@@ -1,0 +1,59 @@
+<script language="javascript" type="text/javascript">
+
+	function enableRoles(set) {
+		roles = document.getElementsByName('role[]');
+		limit = roles.length;
+		for(x = 0; x < limit; x++) {
+			roles[x].disabled = set;
+			if(set) roles[x].checked = false;
+		}
+		userList = document.getElementsByName('setroles');
+		stop = userList.length;
+		for(x = 0; x < stop; x++) {
+			userList[x].disabled = set;
+		}
+	}
+	
+</script>
+<form name="manageroles" id="manageroles" method="POST" action="">
+<div style="text-align: center;">
+  <table style="margin-left:auto;margin-right:auto" cellpadding="10" cellspacing="0" border="0">
+    <tr>
+      <td align="left"><input name="users" value="select" type="radio" onclick="enableRoles(true);" checked> Select users individually.</td>
+    </tr>
+    <tr>
+      <td align="left"><input name="users" value="sitewide" type="radio" onclick="enableRoles(true);"> Enable block site wide. </td>
+    <tr>
+      <td align="left"><input name="users" value="roles" type="radio" onclick="enableRoles(false);"> Select roles: <br />
+      	<table style="margin-left: 18px;margin-top: 6px;" cellpadding="5" cellspacing="0" border="0">
+      	  <?php
+      	  	$row = 0;
+      	  	while($row < $numroles) {
+      	  		echo '<tr>';
+      	  		for($col = 0; $col < $role_cols; $col++) {
+      	  			if($row < $numroles) {
+      	  				echo '<td><input type="checkbox" id="role[]" name="role[]" value="'.$roles[$row]->id.'" disabled/> '.$roles[$row]->name.'</td>';
+      	  			} else {
+      	  				echo '<td> </td>';
+      	  			}
+      	  			$row++;
+      	  		}
+      	  		echo '</tr>';
+      	  	}
+      	  ?>
+      	</table>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input type="radio" name="setroles" id="setroles" value="1" disabled> Populate users 
+        <input type="radio" name="setroles" id="setroles" value="0" disabled checked> Set roles
+      </td>
+    </tr>
+    <tr>
+      <td align="left"><input type="submit" value="Save Settings" /></td>
+    </tr>
+  </table>
+</div>
+</form>
+      

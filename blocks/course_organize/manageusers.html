@@ -1,0 +1,111 @@
+<form id="adduserform" method="POST" action="">
+<div style="text-align:center;">
+<table style="margin-left:auto;margin-right:auto" cellpadding="5" cellspacing="0" border="0">
+  <tr>
+    <td valign="top" align="left">
+      <label for="currentusers"><?php print_string('currentusers', 'block_course_organize'); ?></label><br />
+      <select name="currentusers[]" id="currentusers" size="20" style="width: 300px;" multiple="multiple"
+      		  onfocus="getElementById('adduserform').add.disabled=true;
+      		  		   getElementById('adduserform').remove.disabled=false;
+      		  		   getElementById('adduserform').availableusers.selectedIndex=-1;">
+      		  		   
+      <?php
+      	$i = 0;
+        if($searchcurrent && !empty($searchtext)) {
+        	echo "<optgroup label=\"$strsearchresults (".$countcurrent.")\">\n";
+        	while ($user = rs_fetch_next_record($currentusers)) {
+        		$fullname = fullname($user, true);
+        		echo "<option value=\"".$user->id."\">".$fullname.", ".$user->email."</option>\n";
+        		$i++;
+        	}
+        	if($i == 0) {
+        		echo "<option />";
+        	}
+        } else {
+        	if($countcurrent > MAX_USERS_SHOW ) {
+        		echo "<optgroup label=\"".get_string('toomanytoshow')."\">\n
+        			  <optgroup label=\"".get_string('trysearching')."\">\n";
+        	} else {
+        		while ($user = rs_fetch_next_record($currentusers)) {
+        			$fullname = fullname($user, true);
+        			echo "<option value=\"".$user->id."\">".$fullname.", ".$user->email."</option>\n";
+        			$i++;
+        		}
+        		if($i == 0) {
+        			echo "<option />";
+        		}
+        	}
+        }
+      ?>
+      </select>
+      <br />
+    </td>
+    <td valign="top">
+      <br />
+      <?php check_theme_arrows(); ?>
+      <p class="arrow_button">
+      <input name="add" id="add" type="submit" value="<?php echo $THEME->larrow.'&nbsp;'.get_string('add'); ?>" title="<?php print_string('add'); ?>" /><br />
+      <input name="remove" id="remove" type="submit" value="<?php echo get_string('remove').'&nbsp;'.$THEME->rarrow; ?>" title="<?php print_string('remove'); ?>" />
+      </p>
+    </td>
+    <td valign="top" align="left">
+      <label for=\"availableusers\"><?php print_string('availableusers', 'block_course_organize'); ?></label><br />
+      <select name="availableusers[]" id="availableusers" size="20" style="width: 300px" multiple="multiple"
+              onfocus="getElementById('adduserform').add.disabled=false;
+              		   getElementById('adduserform').remove.disabled=true;
+              		   getElementById('adduserform').currentusers.selectedIndex=-1;">
+      <?php
+        $i = 0;
+        if($searchavailable && !empty($searchtext)) {
+        	echo "<optgroup label=\"$strsearchresults (".$countavailable.")\">\n";
+        	while ($user = rs_fetch_next_record($availableusers)) {
+        		$fullname = fullname($user, true);
+        		echo "<option value=\"".$user->id."\">".$fullname.", ".$user->email."</option>\n";
+        		$i++;
+        	}
+        	if($i == 0) {
+        		echo "<option />";
+        	}
+        } else {
+        	if($countavailable > MAX_USERS_SHOW) {
+        		echo "<optgroup label=\"".get_string('toomanytoshow')."\">\n
+        			  <optgroup label=\"".get_string('trysearching')."\">\n";
+        	} else {
+        		while ($user = rs_fetch_next_record($availableusers)) {
+        			$fullname = fullname($user, true);
+        			echo "<option value=\"".$user->id."\">".$fullname.", ".$user->email."</option>\n";
+        			$i++;
+        		}
+        		if($i == 0) {
+        			echo "<option />";
+        		}
+        	}
+        }
+      
+      ?>
+      </select>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3>
+      <label for="searchavailable" class="accesshide"><?php p(get_string('search')); ?></label>
+      <input type="text" id="searchtext" name="searchtext" size="35" value=" "
+      		 onfocus="getElementById('adduserform').add.disabled=true;
+      		 		  getElementById('adduserform').remove.disabled=true;
+      		 		  getElementById('adduserform').availableusers.selectedIndex=-1;
+      		 		  getElementById('adduserform').currentusers.selectedIndex=-1;" />
+      <input name="search" id="search" type="submit" value="<?php p(get_string('search')) ?>" />
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3>
+      <input type="radio" name="searchtype" id="searchtype" value="current"> Current Users
+      <input type="radio" name="searchtype" id="searchtype" value="available" checked> Available Users
+    </td>
+  </tr>
+</table>
+</div>
+</form>
+        
+      		
+        
