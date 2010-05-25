@@ -1,0 +1,19 @@
+<!-- Moodle Manuals -->
+<tr>
+ <?php 
+    if (!empty($CFG->block_course_menu_teachermanual_url)) {
+        print '<td align="center"><img src="../icons/tmanual.gif" alt="instructor manual" align="texttop" /></td>';
+        print '<td><a href="'.$CFG->block_course_menu_teachermanual_url.'" target="_blank">'.get_string("defaultcourseteacher").' '.get_string('help').'</a></td>';
+        print '<td>'.get_string('instructormanualdesc','block_course_menu').'</td>';
+    }
+?>
+</tr>
+<tr>
+<?php
+    if(!empty($CFG->block_course_menu_studentmanual_url)) {
+        print '<tr><td align="center"><img src="../icons/smanual.gif" alt="student manual" align="texttop" /></td>';
+        print '<td><a href="'.$CFG->block_course_menu_studentmanual_url.'" target"=_blank">'.get_string('studentmanual', 'block_course_menu').'</a></td>';
+        print '<td>'.get_string('studentmanualdesc', 'block_course_menu').'</td>';
+    }
+?>
+</tr>

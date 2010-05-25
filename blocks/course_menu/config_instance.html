@@ -1,0 +1,38 @@
+<?php
+    $menuitems = explode(',', $CFG->block_course_menu_menu_items);
+    if (!isset($this->config)) {
+        $this->config->cp = 'cp';
+        $this->config->gb = 'gb';
+        $this->config->lb = 'lb';
+        $this->config->cal = 'cal';
+        $this->config->tt = 'tt';
+    }
+?>
+
+<div class="course_menu">
+        <div class="row">
+            <span class="label"><?php print_string('menuitems', 'block_course_menu'); ?>:</span>
+            <span class="formw">
+                <?php if (in_array('cp', $menuitems)) { ?>
+                    <input type="hidden" name="cp" value=""/>
+                    <input type="checkbox" name="cp" value="cp" <?php if (!empty($this->config->cp)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('controlpanel', 'block_course_menu');?><br/><?php }?>
+                <?php if (in_array('gb', $menuitems)) { ?>
+                    <input type="hidden" name="gb" value=""/>
+                    <input type="checkbox" name="gb" value="gb" <?php if (!empty($this->config->gb)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('gradebook', 'block_course_menu');?><br/><?php }?>
+                <?php if (in_array('lb', $menuitems)) { ?>
+                    <input type="hidden" name="lb" value=""/>
+                    <input type="checkbox" name="lb" value="lb" <?php if (!empty($this->config->lb)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('librarylinktitle', 'block_course_menu');?><br/><?php }?>
+                <?php if (in_array('cal', $menuitems)) { ?>
+                    <input type="hidden" name="cal" value=""/>
+                    <input type="checkbox" name="cal" value="cal" <?php if (!empty($this->config->cal)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('calendar', 'block_course_menu');?><br/><?php }?>
+                <?php if (in_array('tt', $menuitems)) { ?>
+                    <input type="hidden" name="tt" value=""/>
+                    <input type="checkbox" name="tt" value="tt" <?php if (!empty($this->config->tt)) { echo 'checked="checked"'; } else {echo '';} ?>/><?php print_string('troubletickettitle', 'block_course_menu');?><br/><?php }?>
+            </span>
+        </div>
+
+     <div class="row">
+        <span class="button"><input type="submit" value="<?php print_string('savechanges') ?>" /></span>
+     </div>
+</div>
+

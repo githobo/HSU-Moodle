@@ -1,0 +1,15 @@
+<!-- User Management -->
+<tr>
+  <?php
+    print '<td align="center"><img src="../icons/group.gif" alt="participants" align="texttop" class="icon" /></td>';
+    print '<td><a href="'.$CFG->wwwroot.'/user/index.php?id='.$course->id.'">'.get_string('participants').'</a></td>';
+  ?>
+  <td><?php print_string('participantsdesc', 'block_course_menu');?></td>
+</tr>
+<tr>
+  <?php
+    print '<td align="center"><img src="'.$CFG->pixpath.'/i/group.gif" alt="groups" align="texttop" class="icon" /></td>';
+    print '<td><a href="'.$CFG->wwwroot.'/course/groups.php?id='.$course->id.'">'.get_string("groups").'</a></td>';
+  ?>
+  <td><?php print_string('groupsdesc','block_course_menu');?></td>
+</tr>
