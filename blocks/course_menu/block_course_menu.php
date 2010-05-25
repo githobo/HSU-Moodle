@@ -4,7 +4,7 @@ class block_course_menu extends block_base {
     function init() {
         $this->title = get_string('blockname','block_course_menu');
         $this->content_type = BLOCK_TYPE_TEXT;
-        $this->version = 2005041005;
+        $this->version = 2010052500;
     }
     
     function has_config() {
