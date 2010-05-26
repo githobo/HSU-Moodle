@@ -2155,6 +2155,29 @@ function print_my_moodle() {
     if (!empty($courses) || !empty($rcourses) || !empty($rhosts)) {
 
         if (!empty($courses)) {
+        //HSU mod for course organize code
+            if(record_exists('block_course_organize', 'userid', $USER->id)) {
+                if($courseOrder = unserialize(base64_decode(get_field('block_course_organize', 'classorder', 'userid', $USER->id)))) {
+                    $newOrder = array();
+                    if(count($courseOrder) != count($courses)) {
+                        foreach($courses as $course) {
+                            if(!in_array($course->id, $courseOrder)) {
+                                array_push($newOrder, $course);
+                            }
+                        }
+
+                    }
+                    for($i = 0; $i < count($courseOrder); $i++) {
+                        if($courses[$courseOrder[$i]]) {
+                            array_push($newOrder, $courses[$courseOrder[$i]]);
+                        }
+                    }
+                    $courses = $newOrder;
+                    unset($newOrder);
+                }
+            }
+            //End course organize code
+
             echo '<ul class="unlist">';
             foreach ($courses as $course) {
                 if ($course->id == SITEID) {
