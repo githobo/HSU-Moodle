@@ -1,0 +1,65 @@
+/******************************************************************* styles_color.css   This CSS file contains all styles specific for the HSU moodle 1.8 theme. Coded by Squiggy Rubio. *******************************************************************/body {	background-color: #f8f8f1;	font-family: "Lucida Sans", Verdana, Arial;	font-size: 90%;	color: #003333;	margin: 0px;}a:link,a:visited {	color:#993300;}.headermenu .logininfo {	float: right;	margin-right: 5px;	margin-top: 17px;	z-index: 1;	visibility: visible;}
+a.dimmed:link,a.dimmed:visited {  color:#AAAAAA;}a:hover {	text-decoration: none;	border-bottom-width: 1px;	border-bottom-color: #003333;	}a img {
+	border:none;
+	text-decoration: none;
+	border-bottom-color: none;
+}.commands {	background: #FFFFFF;}.hsu-wordmark {	background-color: #003333;	padding-left: 5px;	padding-top: 5px;	margin: 0px;}#header-home {	/*background: #;*/	width: 100%;	background-image: url(hsu-banner.jpg);	background-repeat: no-repeat;	background-position: left 28;	height: 120px;
+}#header {	background: #;	width: 100%;	background-image: url(hsu-banner.jpg);	background-repeat: no-repeat;	background-position: left 28;	height: 120px;}.headermenu {	border-bottom-width: 2px;	border-bottom-style: solid;	border-bottom-color: #003333;}h1.headermain {	margin-left: 10px;	margin-top: 10px;}.crs-title {}#page {	background-color: #f8f8f1;}#left-column {background-color: none;}#footer {	text-align: center;}.courseboxes {	width: 65%;	margin-left: 13%;	border-top-width: 4px;	border-top-style: solid;	border-top-color: 003333;	}.course-content {	border-top-style: none;	border-right-style: none;	border-bottom-style: none;	border-left-style: none;	}
+
+/* Styles for the front page*/
+.fronthead {
+  font-size:1.3em;
+  letter-spacing:0.04em;
+}
+
+.fronttext {
+  margin-top:5px;
+  margin-left:20px;
+  margin-right:10px;
+  margin-bottom:20px;
+}
+
+a .notifyproblem {
+  text-decoration: underline;
+  color: #AA0000;
+}
+
+div.frontblock {
+  margin-top: 12px;
+  margin-bottom: 25px;
+  border: #758F8E solid 1px;
+  -moz-border-radius-bottomleft: 20px;
+  -moz-border-radius-bottomright: 20px;
+  font-size: 0.95em;
+}
+
+h1.frontblock {
+  border: #758F8E solid 1px;
+  background-image: url(gradient.jpg);  
+  background-position: top;  
+  background-repeat: repeat-x;  
+  padding: 1px 10px;
+  display: inline;
+  position: relative;
+  top: -0.5em;
+  left: 8px;
+  font-weight: normal;
+}
+
+p.fronttext.p1 {
+  min-height: 50px;
+}
+
+body#grade-index .grades .header th{
+  border-color:#e0e0e0;
+  border-width:1px 1px 1px 1px;
+  border-style:solid;
+  border-collapse: collapse;
+}
+
+body#grade-index .grades th{
+  border-color:#e0e0e0;
+  border-width:1px 1px 1px 1px;
+  border-style:solid;
+  border-collapse: collapse;
+}

@@ -1,0 +1,453 @@
+/*******************************************************************
+ styles_layout.css
+
+ This CSS file contains all layout definitions like positioning,
+ floats, margins, padding, borders etc.
+
+ Styles are organised into the following sections:
+  core
+  forms
+  header
+  footer
+
+  admin
+  blocks
+  blog
+  calendar
+  course
+  doc
+  grades
+  login
+  message
+  question
+  tabs
+  user
+
+  various modules
+
+*******************************************************************/
+
+
+/***
+ *** Core
+ ***/
+.boxwidthwide{
+	width:95%;
+}
+
+.boxwidthwide {
+    width:95%;
+}
+
+.groupmanagementtable select {
+  width:200px;
+}
+
+/***
+ *** Forms
+ ***/
+
+/***
+ *** Header
+ ***/
+
+.headermain, h1.headermain {
+  margin:0px;
+  padding:0px;
+}
+
+.headermenu {
+  width: 100%;
+}
+
+.navbar {
+  width:auto;
+  padding:3px 0.5em;
+  border-style: none;
+}
+
+#navmenupopup option {
+}
+
+/***
+ *** Footer
+ ***/
+
+/***
+ *** Filters
+ ***/
+
+/***
+ *** Admin
+ ***/
+
+.profileeditor {
+	text-align: center;
+}
+
+/***
+ *** Blocks
+ ***/
+
+.blockconfigtable {
+  margin-top: 0;
+}
+
+/***
+ *** Blogs
+ ***/
+
+/***
+ *** Calendar
+ ***/
+
+/*Accessibility: controls now div and span, 20:58:20% or 12:74:12% */
+.calendar-controls .previous,
+.calendar-controls .next
+{
+  width: 12%;
+}
+
+.calendar-controls .current {
+  text-align: center;
+}
+.calendar-controls .next {
+  text-align: right;
+}
+span.previous, span.current, span.next {
+  display: block;
+  float: left;
+}
+span.current {
+  width: 76%;
+}
+
+/***
+ *** Course
+ ***/
+
+
+body #middle-column .rolelink {
+	text-align: center;
+}
+
+/***
+ *** Grades
+ ***/
+
+
+
+/***
+ *** Login
+ ***/
+
+/***
+ *** Message
+ ***/
+
+
+/***
+ *** MyMoodle
+ ***/
+
+/***
+ *** Question
+ ***/
+/***
+ *** Logs
+ ***/
+
+/***
+ *** Tabs
+ ***/
+
+.littleintro {
+    margin-top: .5em;
+}
+
+/*globalnav*/
+.headermenu .tabtree {
+  width: 700px;
+  position:relative;
+  float:left;
+  padding-top: 7px;
+  margin-bottom: 0px;
+   z-index: 0;
+}
+
+.headermenu .tabrow0 {
+  text-align: left;
+  padding:0px;
+  margin:0px;
+  list-style:none;
+  line-height:1.8em;
+  font-size: 84%;
+}
+
+.tabrow0 li {
+  display: inline;
+  margin: 0px -4px 0px 0px;
+  padding: 0px;
+}
+
+.tabrow0 a span {
+  padding: 10px 14px 0.35em 0px;
+  background: url(pix/tab/right.gif) no-repeat right top;
+}
+
+.tabrow1 li a span {
+  background: none !important;
+}
+
+.tabrow0 a {
+  text-decoration: none;
+  background: url(pix/tab/left.gif) no-repeat left top;
+  margin: 0 -1px 0 0;
+  padding: 10px 0 0.35em 13px;
+}
+
+.tabrow0 a:hover {
+  background-image: url(pix/tab/left_hover.gif);
+}
+
+.tabrow0 .here a:hover {
+  background-image: url(pix/tab/left.gif);
+}
+
+.tabrow0 a:hover span {
+  background-image: url(pix/tab/right_hover.gif);
+}
+
+.tabrow0 .here a:hover span {
+    background-image: url(pix/tab/right.gif);
+}
+
+.tabrow0 .here a {
+  color:#444;
+}
+
+.tabrow0 .here a:link, .tabrow0 .here a:visited {
+  position:relative;
+  z-index:102;
+}
+
+/*subnav*/
+.tabrow0 .empty {
+  height: 1px;
+  overflow: hidden;
+  padding: 0px;
+  top: 2.7em;
+}
+
+.tabrow0 div,
+.tabrow0 ul {
+  position: absolute;
+  left: 0px;
+  top: 2.7em;
+  width: 100%;
+  margin: 0px;
+  padding: 0.25em 0px;
+  list-style: none;
+  border-top: 0px solid #aaa;
+  line-height: normal;
+  background: transparent url(pix/tab/tabrow1.gif) repeat-x center left;
+  font-size: 90%;
+}
+
+.tabrow0 ul li {
+  display:inline;
+  margin-top:1px;
+  background-image: none;
+}
+
+.tabrow0 ul a {
+  background-image: none;
+  color:#00c;
+  margin:0px;
+  padding:0px 1em;
+  border:0px
+}
+
+.tabrow0 ul a span {
+  padding: 0px;
+  background-image: none;
+}
+
+.tabrow0 ul .last span,
+.tabrow0 ul li a:hover, .tabrow0 ul li a:hover span,
+.tabrow0 ul .here a:hover, .tabrow0 ul .here a:hover span {
+ background-image: none !important;
+}
+
+.tabrow0 ul div {
+  display: none;
+}
+
+ul.tabrow1 li a,
+ul.tabrow1 li a:link,
+ul.tabrow1 li a:visited {
+  color:#00c;
+  font-size: 110%;
+}
+
+ul.tabrow1 li.here.selected a {
+  color:#444;
+}
+
+/***
+ *** User
+ ***/
+
+/***
+ *** Modules: Chat
+ ***/
+
+#mod-chat-view #enterlink {
+
+}
+
+/***
+ *** Modules: Choice
+ ***/
+
+/***
+ *** Modules: Data
+ ***/
+
+
+/***
+ *** Modules: Forum
+ ***/
+#treeDiv2 .picture {
+width:35px;
+}
+#treeDiv2 .replies {
+text-align:center;
+white-space:nowrap;
+width:13%;
+}
+#treeDiv2 .topic {
+background:#DDDDDD none repeat scroll 0 50%;
+vertical-align:middle;
+width:28%;
+}
+#treeDiv2 .topictrack {
+background:#DDDDDD none repeat scroll 0 50%;
+vertical-align:middle;
+width:18%;
+}
+.forumheaderlist .starter {
+background:#DDDDDD none repeat scroll 0 50%;
+vertical-align:middle;
+}
+#treeDiv2 table {
+width:100%;
+}
+#treeDiv2 td {
+border-color:#FFFFFF;
+border-style:solid;
+border-width:1px 0 0 1px;
+}
+#treeDiv2 .author {
+white-space:nowrap;
+width:17%;
+}
+#treeDiv2 .lastpost {
+font-size:0.7em;
+text-align:right;
+white-space:nowrap;
+}
+.forumheaderlist td.lastpost {
+font-size:0.7em;
+text-align:right;
+white-space:nowrap;
+}
+#treeDiv2 .content {
+background:#FFFFFF none repeat scroll 0 50%;
+clear:both;
+float:left;
+min-width:30%;
+padding:4px;
+}
+.forumheaderlist .content {
+background:#FFFFFF none repeat scroll 0 50%;
+clear:both;
+float:left;
+min-width:30%;
+padding:4px;
+}
+#treeDiv2 .indent {
+clear:both;
+//float:left;
+margin-left:30px;
+}
+#treeDiv2 .subscription {
+text-align:center;
+width:17%;
+}
+.forumheaderlist .subscription {
+text-align:center;
+}
+#treeDiv2 .content .commands {
+clear:both;
+padding-top:0.05em;
+padding-bottom:1em;
+text-align:right;
+}
+.forumheaderlist .content .commands {
+clear:both;
+padding-top:0.05em;
+text-align:right;
+}
+
+
+/***
+ *** Modules: Glossary
+ ***/
+
+.entrybox table tbody tr td {
+    padding: 4px;
+}
+
+/***
+ *** Modules: Journal
+ ***/
+
+/***
+ *** Modules: Label
+ ***/
+
+/***
+ *** Modules: Lesson
+ ***/
+
+/***
+ *** Modules: Quiz
+ ***/
+
+
+/***
+ *** Modules: Resource
+ ***/
+
+#mod-resource-view .resourcepdf {
+}
+
+.resourcepdf object{
+}
+
+/***
+ *** Modules: Scorm
+ ***/
+
+/***
+ *** Modules: Survey
+ ***/
+
+/***
+ *** Modules: Wiki
+ ***/
+
+/***
+ *** Modules: Workshop
+ ***/
