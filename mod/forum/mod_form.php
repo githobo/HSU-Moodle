@@ -13,7 +13,7 @@ class mod_forum_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'name', get_string('forumname', 'forum'), array('size'=>'64'));
         if (!empty($CFG->formatstringstriptags)) {
-            $mform->setType('name', PARAM_TEXT);
+        $mform->setType('name', PARAM_TEXT);
         } else {
             $mform->setType('name', PARAM_CLEAN);
         }
@@ -26,6 +26,12 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->addElement('select', 'type', get_string('forumtype', 'forum'), $forum_types);
         $mform->setHelpButton('type', array('forumtype', get_string('forumtype', 'forum'), 'forum'));
         $mform->setDefault('type', 'general');
+        
+        // Chris adds a new option (Anonymous)
+        $mform->addElement('selectyesno', 'anonymous', get_string('enableanonymous','forum') );
+        $mform->setHelpButton('anonymous', array('enableanonymous', get_string('enableanonymous', 'forum'), 'forum'));
+        $mform->setDefault('anonymous', 0);
+        // End
 
         $mform->addElement('htmleditor', 'intro', get_string('forumintro', 'forum'));
         $mform->setType('intro', PARAM_RAW);
@@ -46,6 +52,21 @@ class mod_forum_mod_form extends moodleform_mod {
         $options[FORUM_TRACKING_ON] = get_string('trackingon', 'forum');
         $mform->addElement('select', 'trackingtype', get_string('trackingtype', 'forum'), $options);
         $mform->setHelpButton('trackingtype', array('trackingtype', get_string('trackingtype', 'forum'), 'forum'));
+
+// Multi Attachment settings added by Moodlerooms
+        $mform->addElement('checkbox', 'multiattach', get_string('allowmultiattach','forum') );
+        $mform->setHelpButton('multiattach', array('multiattach', get_string('multiattach','forum'), 'forum'));
+        $mform->setDefault('multiattach', 0);
+
+        $choices = array();
+        for($i = 1; $i < ($CFG->forum_maxattachments+1); $i++){
+            $choices[$i] = $i;
+        }
+        $mform->addElement('select','maxattach',get_string('maxattachnum','forum'),$choices);
+        $mform->disabledIf('maxattach', 'multiattach');
+        $mform->setHelpButton('maxattach', array('maxattach', get_string('maxnum','forum'), 'forum'));
+        $mform->setDefault('maxattach', $CFG->forum_maxattachments);
+//End Multi Attachment settings  
 
         $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
         $choices[1] = get_string('uploadnotallowed');
@@ -102,8 +123,8 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->addElement('date_time_selector', 'assesstimefinish', get_string('to'));
         $mform->disabledIf('assesstimefinish', 'assessed', 'eq', 0);
         $mform->disabledIf('assesstimefinish', 'ratingtime');
-
-
+       
+		 
 //-------------------------------------------------------------------------------
         $mform->addElement('header', '', get_string('blockafter', 'forum'));
         $options = array();
@@ -142,7 +163,6 @@ class mod_forum_mod_form extends moodleform_mod {
 //-------------------------------------------------------------------------------
 // buttons
         $this->add_action_buttons();
-
     }
 
     function definition_after_data(){
@@ -177,6 +197,12 @@ class mod_forum_mod_form extends moodleform_mod {
         } else {
             $default_values['ratingtime']=
                 ($default_values['assesstimestart'] && $default_values['assesstimefinish']) ? 1 : 0;
+        }
+        
+        // Save previous anonymous value with config plug in forum id
+        // So we can determine if we need to warn the user of the change
+        if(isset($default_values['anonymous'])){
+            set_config('anonymous_change',$default_values['anonymous'],$this->_instance);
         }
     }
 

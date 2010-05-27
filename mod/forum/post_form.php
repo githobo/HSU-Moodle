@@ -6,7 +6,7 @@ class mod_forum_post_form extends moodleform {
 
     function definition() {
 
-        global $CFG;
+        global $CFG, $USER;
         $mform    =& $this->_form;
 
         $course        = $this->_customdata['course'];
@@ -15,17 +15,24 @@ class mod_forum_post_form extends moodleform {
         $modcontext    = $this->_customdata['modcontext'];
         $forum         = $this->_customdata['forum'];
         $post          = $this->_customdata['post']; // hack alert
+        $anony_opt     = $this->_customdata['anony_opt'];
 
 
         // the upload manager is used directly in post precessing, moodleform::save_files() is not used yet
-        $this->set_upload_manager(new upload_manager('attachment', true, false, $course, false, $forum->maxbytes, true, true));
+        
+       
+        if ($forum->multiattach) {
+        	$this->set_upload_manager(new upload_manager('', false, false, $course, true, $forum->maxbytes, true, true, false));
+        } else {
+        	$this->set_upload_manager(new upload_manager('attachment', true, false, $course, false, $forum->maxbytes, true, true));        
+        }
 
         $mform->addElement('header', 'general', '');//fill in the data depending on page params
                                                     //later using set_data
         $mform->addElement('text', 'subject', get_string('subject', 'forum'), 'size="48"');
         $mform->setType('subject', PARAM_TEXT);
         $mform->addRule('subject', get_string('required'), 'required', null, 'client');
-        $mform->addRule('subject', get_string('maximumchars', '', 255), 'maxlength', 255, 'client'); 
+        $mform->addRule('subject', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
         $mform->addElement('htmleditor', 'message', get_string('message', 'forum'), array('cols'=>50, 'rows'=>30));
         $mform->setType('message', PARAM_RAW);
@@ -59,9 +66,23 @@ class mod_forum_post_form extends moodleform {
         }
 
         if ($forum->maxbytes != 1 && has_capability('mod/forum:createattachment', $modcontext))  {  //  1 = No attachments at all
-            $mform->addElement('file', 'attachment', get_string('attachment', 'forum'));
-            $mform->setHelpButton('attachment', array('attachment', get_string('attachment', 'forum'), 'forum'));
-
+        
+        	if ($forum->multiattach) {
+				// Multiattachment feature requires javascript on in order to add more file upload fields
+        		$mform->addElement('file', 'FILE_0', get_string('attachment', 'forum'), 'onchange="addFileInput(\''.'Remove'.'\','.$forum->maxattach.');"');
+				$mform->addElement('link', 'addinput','',
+							 	 '#','Another File','onclick="addFileInput(\''.'Remove'.'\','.$forum->maxattach.');"' );
+							 	 
+				// rewrite form with the new elements
+    			foreach( $_FILES as $key=>$value) {
+	    			if ( substr($key, 0, strlen($key)-1) == 'FILE_' && !$mform->elementExists($key)) {
+						$mform->addElement('file', $key, '', 'value="'.$value.'"');
+	    			}
+    			}
+        	} else {
+            	$mform->addElement('file', 'attachment', get_string('attachment', 'forum'));
+            	$mform->setHelpButton('attachment', array('attachment', get_string('attachment', 'forum'), 'forum'));        		
+        	}
         }
 
         if (empty($post->id) && has_capability('moodle/course:manageactivities', $coursecontext)) { // hack alert
@@ -96,6 +117,21 @@ class mod_forum_post_form extends moodleform {
         }
 
 //-------------------------------------------------------------------------------
+
+        if (isset($post->id)) {
+            $reveal_value = get_field('forum_posts','reveal','id',$post->id);
+        } else {
+            $reveal_value = 0;
+        }
+        if ($anony_opt and $USER->id == $post->userid and isset($reveal_value)) {
+            $mform->addElement('selectyesno', 'reveal', get_string('disable_anonymous_post','forum') );
+            $mform->setDefault('reveal',$reveal_value);
+            $mform->setHelpButton('reveal', array('revealyourself', get_string('disable_anonymous_post', 'forum'), 'forum'));
+        } else { // we still need the element in order to set a default value
+            $mform->addElement('hidden', 'reveal' );
+            $mform->setDefault('reveal',$reveal_value);
+        }
+        
         // buttons
         if (isset($post->edit)) { // hack alert
             $submit_string = get_string('savechanges');
@@ -103,6 +139,9 @@ class mod_forum_post_form extends moodleform {
             $submit_string = get_string('posttoforum', 'forum');
         }
         $this->add_action_buttons(false, $submit_string);
+        
+        $mform->addElement('hidden', 'show_anony');
+        $mform->setType('show_anony', PARAM_INT);
 
         $mform->addElement('hidden', 'course');
         $mform->setType('course', PARAM_INT);
@@ -136,8 +175,19 @@ class mod_forum_post_form extends moodleform {
             && $data['timeend'] <= $data['timestart']) {
                 $errors['timeend'] = get_string('timestartenderror', 'forum');
             }
+            
+        // add elements for all the file upload elements we made so moodle knows
+        // they are the files we want.
+        $mform    =& $this->_form;
+    	foreach( $_FILES as $key=>$value) {
+    		if ( substr($key, 0, strlen($key)-1) == 'FILE_' && !$mform->elementExists($key)) {
+				$mform->addElement('file', $key, '', 'value="'.$value.'"');
+    		}
+    	}
+    	
         return $errors;
     }
+ 
 
 }
 ?>

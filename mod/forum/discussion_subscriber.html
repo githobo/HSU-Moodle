@@ -1,8 +1,6 @@
-
-<form id="subscriberform" method="post" action="subscribers.php">
-<input type="hidden" name="previoussearch" value="<?php p($previoussearch) ?>" />
+<form id="subscriberform" method="post" action="discussion_subscribers.php">
+<input type="hidden" name="previoussearch" value="<?php echo $previoussearch ?>" />
 <input type="hidden" name="id" value="<?php echo $id?>" />
-<input type="hidden" name="sesskey" value="<?php echo sesskey() ?>" />
   <table align="center" border="0" cellpadding="5" cellspacing="0">
     <tr>
       <td valign="top">
@@ -15,7 +13,7 @@
     </tr>
     <tr>
       <td valign="top">
-          <select name="removeselect[]" size="20" id="removeselect" multiple="multiple"
+          <select name="removeselect[]" size="20" id="removeselect" multiple
                   onFocus="getElementById('subscriberform').add.disabled=true;
                            getElementById('subscriberform').remove.disabled=false;
                            getElementById('subscriberform').addselect.selectedIndex=-1;">
@@ -35,12 +33,12 @@
         <br />
       </td>
       <td valign="top">
-          <select name="addselect[]" size="20" id="addselect" multiple="multiple"
+          <select name="addselect[]" size="20" id="addselect" multiple
                   onFocus="getElementById('subscriberform').add.disabled=false;
                            getElementById('subscriberform').remove.disabled=true;
                            getElementById('subscriberform').removeselect.selectedIndex=-1;">
           <?php
-              if (isset($searchusers)) {
+              if (!empty($searchusers)) {
                   echo "<optgroup label=\"$strsearchresults (" . count($searchusers) . ")\">\n";
                   foreach ($searchusers as $user) {
                       $fullname = fullname($user, true);
@@ -57,10 +55,19 @@
           ?>
          </select>
          <br />
-         <input type="text" name="searchtext" size="30" value="<?php p($searchtext, true) ?>" />
+         <input type="text" name="searchtext" size="30" value="<?php echo $searchtext ?>" 
+                  onFocus ="getElementById('subscriberform').add.disabled=true;
+                            getElementById('subscriberform').remove.disabled=true;
+                            getElementById('subscriberform').removeselect.selectedIndex=-1;
+                            getElementById('subscriberform').addselect.selectedIndex=-1;"
+                  onkeydown = "var keyCode = event.which ? event.which : event.keyCode;
+                               if (keyCode == 13) {
+                                    getElementById('subscriberform').previoussearch.value=1;
+                                    getElementById('subscriberform').submit();
+                               } " />
          <input name="search" id="search" type="submit" value="<?php p($strsearch) ?>" />
          <?php
-              if (isset($searchusers)) {
+              if (!empty($searchusers)) {
                   echo '<input name="showall" id="showall" type="submit" value="'.$strshowall.'" />'."\n";
               }
          ?>

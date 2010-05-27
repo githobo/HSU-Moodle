@@ -14,13 +14,13 @@ function useredit_load_preferences(&$user, $reload=true) {
             // reload preferences in case it was changed in other session
             unset($USER->preference);
         }
-        
+
         if ($preferences = get_user_preferences(null, null, $user->id)) {
-            foreach($preferences as $name=>$value) {
-                $user->{'preference_'.$name} = $value;
-            }
+        foreach($preferences as $name=>$value) {
+            $user->{'preference_'.$name} = $value;
         }
     }
+}
 }
 
 function useredit_update_user_preference($usernew) {
@@ -104,8 +104,8 @@ function useredit_shared_definition(&$mform) {
                 . get_string('auth_emailchangecancel', 'auth') . '</a>';
         $mform->addElement('static', 'emailpending', get_string('email'), $notice);
     } else {
-        $mform->addElement('text', 'email', get_string('email'), 'maxlength="100" size="30"');
-        $mform->addRule('email', $strrequired, 'required', null, 'client');
+    $mform->addElement('text', 'email', get_string('email'), 'maxlength="100" size="30"');
+    $mform->addRule('email', $strrequired, 'required', null, 'client');
     }
 
     $choices = array();
@@ -164,6 +164,15 @@ function useredit_shared_definition(&$mform) {
         $mform->setDefault('trackforums', 0);
         $mform->setAdvanced('trackforums');
     }
+    
+    $choices = array();
+    $choices['0'] = get_string('flatforum', 'forum');
+    $choices['1'] = get_string('expandableforum', 'forum');
+    $mform->addElement('select', 'preference_forumview', get_string('forumview', 'forum'), $choices);
+    $mform->setDefault('preference_forumview', 0);
+    $mform->setAdvanced('preference_forumview');
+    $mform->setHelpButton('preference_forumview', array('forumview', get_string('forumview', 'forum'), 'forum'));
+    
 
     if ($CFG->htmleditor) {
         $choices = array();
@@ -252,7 +261,7 @@ function useredit_shared_definition(&$mform) {
         $mform->setHelpButton('interests', array('interestslist', get_string('helpinterestslist'),
                           false, true, false));
     }
-
+    
     /// Moodle optional fields
     $mform->addElement('header', 'moodle_optional', get_string('optional', 'form'));
     $mform->setAdvanced('moodle_optional');
@@ -292,8 +301,8 @@ function useredit_shared_definition(&$mform) {
 
     $mform->addElement('text', 'address', get_string('address'), 'maxlength="70" size="25"');
     $mform->setType('address', PARAM_MULTILANG);
-
-
+    
+    
 }
 
 ?>

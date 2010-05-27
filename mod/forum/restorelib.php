@@ -57,6 +57,9 @@
             $forum->type = backup_todb($info['MOD']['#']['TYPE']['0']['#']);
             $forum->name = backup_todb($info['MOD']['#']['NAME']['0']['#']);
             $forum->intro = backup_todb($info['MOD']['#']['INTRO']['0']['#']);
+            if (isset($info['MOD']['#']['ANONYMOUS']['0']['#'])) {
+                $forum->anonymous = backup_todb($info['MOD']['#']['ANONYMOUS']['0']['#']);
+            }
             
             // These get dropped in Moodle 1.7 when the new Roles System gets
             // set up. Therefore they might or not be there depending on whether
@@ -181,6 +184,63 @@
             
         } else {
             $status = false;
+        }
+
+        return $status;
+    }
+    
+//This function restores the forum_discussion_subscriptions (called from forum_discussion_restore_mods)
+    function forum_discussion_subscriptions_restore_mods($discussion_id,$info,$restore) { 
+        global $CFG;
+
+        $status = true;
+
+        //Get discussion_subscriptions array
+        $discussion_subscriptions = array();
+        if (isset($info['#']['DISCUSSION_SUBSCRIPTIONS']['0']['#']['DISCUSSION_SUBSCRIPTION'])) {
+            $discussion_subscriptions = $info['#']['DISCUSSION_SUBSCRIPTIONS']['0']['#']['DISCUSSION_SUBSCRIPTION'];
+        }
+
+        //Iterate over discussion_subscriptions
+        for($i = 0; $i < sizeof($discussion_subscriptions); $i++) { 
+            $dis_sub_info = $discussion_subscriptions[$i];
+
+            // Get old info
+            $oldid = backup_todb($dis_sub_info['#']['ID']['0']['#']);
+            $olduserid = backup_todb($dis_sub_info['#']['ID']['0']['#']);
+
+            // Conscruct forum_discussion_subscriptions record structure
+            $discussion_subscription->discussion = $discussion_id;
+            $discussion_subscription->userid = backup_todb($dis_sub_info['#']['USERID']['0']['#']);
+
+            //Reencode the userid field
+            $user = backup_getid($restore->backup_unique_code,"user",$discussion_subscription->userid);
+            if ($user) { 
+                $discussion_subscription->userid = $user->new_id;
+            }
+
+            //Insert the row into forum_discussion_subscription
+            $newid = insert_record ("forum_discussion_subscripts", $discussion_subscription);
+
+            //Do some output
+            if (($i+1) % 50 == 0) {
+                if (!defined('RESTORE_SILENTLY')) {
+                    echo ".";
+                    if (($i+1) % 1000 == 0) {
+                        echo "<br />";
+                    }
+                }
+                backup_flush(300);
+            }
+
+            if ($newid) {
+                //We have the newid, update backup_ids
+                backup_putid($restore->backup_unique_code,"forum_discussion_subscriptions", $oldid,
+                             $newid);
+            } else {
+                $status = false;
+            }
+            
         }
 
         return $status;
@@ -323,6 +383,8 @@
                 //We have the newid, update backup_ids
                 backup_putid($restore->backup_unique_code,"forum_discussions",$oldid,
                              $newid);
+                //Restore discussion_subscriptions
+                $status = forum_discussion_subscriptions_restore_mods ($newid,$dis_info,$restore);
                 //Restore forum_posts
                 $status = forum_posts_restore_mods ($forum_id,$newid,$dis_info,$restore);
                 //Now recalculate firstpost field
@@ -477,6 +539,9 @@
             $post->attachment = backup_todb($pos_info['#']['ATTACHMENT']['0']['#']);
             $post->totalscore = backup_todb($pos_info['#']['TOTALSCORE']['0']['#']);
             $post->mailnow = backup_todb($pos_info['#']['MAILNOW']['0']['#']);
+            if (isset($pos_info['#']['REVEAL']['0']['#'])) {
+                $post->reveal = backup_todb($pos_info['#']['REVEAL']['0']['#']);
+            }
 
             //We have to recode the userid field
             $user = backup_getid($restore->backup_unique_code,"user",$post->userid);

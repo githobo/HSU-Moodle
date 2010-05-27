@@ -1,4 +1,4 @@
-<?php  //$Id$
+<?php  //$Id: settings.php,v 1.1.2.4 2008/02/13 17:01:42 skodak Exp $
 
 require_once($CFG->dirroot.'/mod/forum/lib.php');
 
@@ -19,6 +19,14 @@ $settings->add(new admin_setting_configtext('forum_longpost', get_string('longpo
 // Number of discussions on a page
 $settings->add(new admin_setting_configtext('forum_manydiscussions', get_string('manydiscussions', 'forum'),
                    get_string('configmanydiscussions', 'forum'), 100, PARAM_INT));
+
+//Number of attachments per post
+$options = array();
+for ($i=1; $i<=20; $i++) {
+    $options[$i] = $i;
+}       
+$settings->add(new admin_setting_configselect('forum_maxattachments', get_string('maxattachments', 'forum'),
+                   get_string('configmaxattachments', 'forum'), 1, $options));
 
 $settings->add(new admin_setting_configselect('forum_maxbytes', get_string('maxattachmentsize', 'forum'),
                    get_string('configmaxbytes', 'forum'), 512000, get_max_upload_sizes($CFG->maxbytes)));
@@ -57,6 +65,13 @@ $settings->add(new admin_setting_configselect('forum_enablerssfeeds', get_string
 
 $settings->add(new admin_setting_configcheckbox('forum_enabletimedposts', get_string('timedposts', 'forum'),
                    get_string('configenabletimedposts', 'forum'), 0));
+                   
+$options = array();
+for ($i=20; $i<=40; $i++) {
+    $options[$i] = $i;
+}
+$settings->add(new admin_setting_configselect('forum_maxtopicchars', get_string('maxtopicchars', 'forum'),
+				   get_string('configmaxtopicchars', 'forum'), 20, $options));
 
 $settings->add(new admin_setting_configcheckbox('forum_logblocked', get_string('logblocked', 'forum'),
                    get_string('configlogblocked', 'forum'), 1));

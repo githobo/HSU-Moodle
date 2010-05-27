@@ -83,9 +83,77 @@ function xmldb_forum_upgrade($oldversion=0) {
         }
     }
 
-    if ($result && $oldversion < 2007101513) {
-        delete_records('forum_ratings', 'post', 0); /// Clean existing wrong rates. MDL-18227
+// Changes for Anonymous Forum posts
+      if ($result && $oldversion < 2008073000) {
+        $table = new XMLDBTable('forum');
+        $AnonyField = new XMLDBField('anonymous');
+        $AnonyField->setAttributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'type');
+        $result = $result && add_field($table, $AnonyField);
+
     }
+
+    if ($result && $oldversion < 2008073000) {
+
+    /// Define field reveal to be added to forum_posts
+        $table = new XMLDBTable('forum_posts');
+        $field = new XMLDBField('reveal');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'mailnow');
+
+    /// Launch add field reveal
+        $result = $result && add_field($table, $field);
+    }
+
+    /// Create discussion_subscriptions table
+    if ($result && $oldversion < 2008073000) {
+
+        //Create table
+        $table = new XMLDBTable('forum_discussion_subscripts');
+        $table->comment = 'Keeps tracks of the subscriptions to specific topics';
+
+        //Fields
+        $f = $table->addFieldInfo('id',                 XMLDB_TYPE_INTEGER,  '10', XMLDB_UNSIGNED,
+                                  XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
+        $f->comment = 'Unique Host ID';
+        $f = $table->addFieldInfo('userid',             XMLDB_TYPE_INTEGER,  '10', XMLDB_UNSIGNED,
+                                  XMLDB_NOTNULL, null, null, null, 0);
+        $f = $table->addFieldInfo('discussion',         XMLDB_TYPE_INTEGER,  '10', XMLDB_UNSIGNED,
+                                  XMLDB_NOTNULL, null, null, null, null);
+
+        //Primary Key
+        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
+        //Foreign Key on forum_discussions.id
+        $table->addKeyInfo('discussion', XMLDB_KEY_FOREIGN, array('discussion'), 'forum_discussions', array('id'));
+        //Indexes
+        $table->addIndexInfo('userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+
+        //Create the table
+        $result = $result && create_table($table);
+    }
+
+
+    // Multiattach stuff
+    if ($result && $oldversion < 2008080501) {
+
+    /// Define field multiattach to be added to forum
+        $table = new XMLDBTable('forum');
+        $field = new XMLDBField('multiattach');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '1', 'maxbytes');
+
+    /// Launch add field multiattach
+        $result = $result && add_field($table, $field);
+    }
+
+    if ($result && $oldversion < 2008080501) {
+
+    /// Define field maxattach to be added to forum
+        $table = new XMLDBTable('forum');
+        $field = new XMLDBField('maxattach');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '5', 'multiattach');
+
+    /// Launch add field maxattach
+        $result = $result && add_field($table, $field);
+    }
+
 
     return $result;
 }

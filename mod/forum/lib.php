@@ -9,6 +9,12 @@ define('FORUM_MODE_FLATNEWEST', -1);
 define('FORUM_MODE_THREADED', 2);
 define('FORUM_MODE_NESTED', 3);
 
+define('FORUM_SORT_NEWESTREPLY', 1);
+define('FORUM_SORT_FIRSTNAME', 2);
+define('FORUM_SORT_LASTNAME', 3);
+define('FORUM_SORT_OLDCREATED', 4);
+define('FORUM_SORT_NEWCREATED', 5);
+
 define('FORUM_FORCESUBSCRIBE', 1);
 define('FORUM_INITIALSUBSCRIBE', 2);
 define('FORUM_DISALLOWSUBSCRIBE',3);
@@ -26,6 +32,12 @@ define ('FORUM_AGGREGATE_MAX', 3);
 define ('FORUM_AGGREGATE_MIN', 4);
 define ('FORUM_AGGREGATE_SUM', 5);
 
+$FORUM_SORT_MODES = array ( FORUM_SORT_NEWESTREPLY => get_string('sortnewestreply', 'forum'),
+                            FORUM_SORT_FIRSTNAME   => get_string('sortfirstname', 'forum'),
+                            FORUM_SORT_LASTNAME    => get_string('sortlastname', 'forum'),
+                            FORUM_SORT_OLDCREATED  => get_string('sortoldcreated', 'forum'),
+                            FORUM_SORT_NEWCREATED  => get_string('sortnewcreated', 'forum') );
+
 /// STANDARD FUNCTIONS ///////////////////////////////////////////////////////////
 
 /**
@@ -40,6 +52,11 @@ function forum_add_instance($forum) {
     global $CFG;
 
     $forum->timemodified = time();
+
+	// Checkboxes aren't sent when they are unchecked :(
+	if (empty($forum->multiattach) ) {
+		$forum->multiattach = 0;
+	}
 
     if (empty($forum->assessed)) {
         $forum->assessed = 0;
@@ -64,6 +81,8 @@ function forum_add_instance($forum) {
         $discussion->format   = $forum->type;
         $discussion->mailnow  = false;
         $discussion->groupid  = -1;
+        $discussion->reveal   = 0; // Allow Single Discussion to work
+
 
         if (! forum_add_discussion($discussion, $discussion->intro)) {
             error('Could not add the discussion for this forum');
@@ -102,6 +121,11 @@ function forum_update_instance($forum) {
 
     $forum->timemodified = time();
     $forum->id           = $forum->instance;
+
+	// Checkboxes aren't sent when they are unchecked :(
+	if (empty($forum->multiattach) ) {
+		$forum->multiattach = 0;
+	}
 
     if (empty($forum->assessed)) {
         $forum->assessed = 0;
@@ -144,7 +168,7 @@ function forum_update_instance($forum) {
                     error('Could not add the discussion for this forum');
                 }
 
-            }
+              }
         }
         if (! $post = get_record('forum_posts', 'id', $discussion->firstpost)) {
             error('Could not find the first post in this forum discussion');
@@ -241,6 +265,7 @@ function forum_cron() {
     $courses         = array();
     $coursemodules   = array();
     $subscribedusers = array();
+    $discussionsubscribers  = array();
 
 
     // Posts older than 2 days will not be mailed.  This is to avoid the problem where
@@ -326,6 +351,25 @@ function forum_cron() {
                 }
             }
 
+            // caching subscribed users of each discussion
+            if (!isset($discussionsubscribers[$discussionid])) {
+                if ($subusers = forum_discussion_subscribed_users($courses[$courseid], $discussions[$discussionid], 0, true)) {
+                    // Get a list of the users subscribed to discussions in the forum.
+                    foreach ($subusers as $postuser) {
+                        // do not try to mail users with stopped email
+                        if ($postuser->emailstop) {
+                            add_to_log(SITEID, 'forum', 'mail blocked', '', '', 0, $postuser->id);
+                            continue;
+                        }
+
+                        // the user is subscribed to this discussion
+                        $discussionsubscribers[$discussionid][$postuser->id] = $postuser->id;
+                        // add the user to the list of users to process
+                        $users[$postuser->id] = $postuser;
+                    }
+                }
+            }
+
             $mailcount[$pid] = 0;
             $errorcount[$pid] = 0;
         }
@@ -368,7 +412,9 @@ function forum_cron() {
 
                 // Do some checks  to see if we can bail out now
                 if (!isset($subscribedusers[$forum->id][$userto->id])) {
-                    continue; // user does not subscribe to this forum
+                    if (!isset($discussionsubscribers[$discussion->id][$userto->id])) {
+                        continue; // user does not subscribe to this forum
+                    }
                 }
 
                 // Verify user is enrollend in course - if not do not send any email
@@ -469,6 +515,11 @@ function forum_cron() {
                 // Send the post now!
 
                 mtrace('Sending ', '');
+
+                $anonymous = get_field('forum','anonymous','id',$forum->id);
+                if($anonymous) {
+                    $userfrom = "Moodle";
+                }
 
                 if (!$mailresult = email_to_user($userto, $userfrom, $postsubject, $posttext,
                                                  $posthtml, '', '', $CFG->forum_replytouser)) {
@@ -722,14 +773,19 @@ function forum_cron() {
                         $userfrom->customheaders = array ("Precedence: Bulk");
 
                         if ($userto->maildigest == 2) {
+                            $anonymous = $forum->anonymous;
+                            $reveal = get_field('forum_posts', 'reveal', 'id', $post->id);
+                            if ($reveal) { // preserve ability to use ternary operators
+                                $anonymous = 0;
+                            }
                             // Subjects only
                             $by = new object();
-                            $by->name = fullname($userfrom);
+                            $by->name = $anonymous ? get_string('anonymous','forum') : fullname($userfrom);
                             $by->date = userdate($post->modified);
                             $posttext .= "\n".format_string($post->subject,true).' '.get_string("bynameondate", "forum", $by);
                             $posttext .= "\n---------------------------------------------------------------------";
 
-                            $by->name = "<a target=\"_blank\" href=\"$CFG->wwwroot/user/view.php?id=$userfrom->id&amp;course=$course->id\">$by->name</a>";
+                            $by->name = "<a target=\"_blank\" href=\"$CFG->wwwroot/user/view.php?id=".$anonymous ? 1 :$userfrom->id."&amp;course=$course->id\">$by->name</a>";
                             $posthtml .= '<div><a target="_blank" href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$discussion->id.'#p'.$post->id.'">'.format_string($post->subject,true).'</a> '.get_string("bynameondate", "forum", $by).'</div>';
 
                         } else {
@@ -832,7 +888,20 @@ function forum_make_mail_text($course, $forum, $discussion, $post, $userfrom, $u
     }
 
     $by = New stdClass;
-    $by->name = fullname($userfrom, $viewfullnames);
+
+
+    $anonymous = get_field('forum','anonymous','id',$forum->id);
+    $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+    if ($reveal) { // preserve ability to use ternary operators
+        $anonymous = 0;
+    }
+
+    if($anonymous){
+        $by->name = get_string('anonymous', 'forum');
+    } else {
+        $by->name = fullname($userfrom, $viewfullnames);
+    }
+
     $by->date = userdate($post->modified, "", $userto->timezone);
 
     $strbynameondate = get_string('bynameondate', 'forum', $by);
@@ -958,13 +1027,13 @@ function forum_user_outline($course, $user, $mod, $forum) {
     $count = forum_count_user_posts($forum->id, $user->id);
 
     if ($count && $count->postcount > 0) {
-        $result = new object();
-        $result->info = get_string("numposts", "forum", $count->postcount);
-        $result->time = $count->lastpost;
-        if ($grade) {
-            $result->info .= ', ' . get_string('grade') . ': ' . $grade->str_long_grade;
-        }
-        return $result;
+            $result = new object();
+            $result->info = get_string("numposts", "forum", $count->postcount);
+            $result->time = $count->lastpost;
+            if ($grade) {
+                $result->info .= ', ' . get_string('grade') . ': ' . $grade->str_long_grade;
+            }
+            return $result;
     } else if ($grade) {
         $result = new object();
         $result->info = get_string('grade') . ': ' . $grade->str_long_grade;
@@ -1020,7 +1089,7 @@ function forum_user_complete($course, $user, $mod, $forum) {
                 continue;
             }
             $discussion = $discussions[$post->discussion];
-            
+
             $ratings = null;
 
             if ($forum->assessed) {
@@ -1030,7 +1099,7 @@ function forum_user_complete($course, $user, $mod, $forum) {
                     $ratings->assesstimestart = $forum->assesstimestart;
                     $ratings->assesstimefinish = $forum->assesstimefinish;
                     $ratings->allow = false;
-                }
+        }
             }
 
             forum_print_post($post, $discussion, $forum, $cm, $course, false, false, false, $ratings);
@@ -1040,7 +1109,6 @@ function forum_user_complete($course, $user, $mod, $forum) {
         echo "<p>".get_string("noposts", "forum")."</p>";
     }
 }
-
 
 /**
  *
@@ -1235,9 +1303,23 @@ function forum_print_recent_activity($course, $viewfullnames, $timestart) {
     foreach ($printposts as $post) {
         $subjectclass = empty($post->parent) ? ' bold' : '';
 
+        // Anonymous
+
+        $anonymous = get_field('forum','anonymous','id',$post->forum);
+        if ($post->reveal) { // preserve ability to use ternary operators
+            $anonymous = 0;
+        }
+
+        if ($anonymous) {
+            $name = get_string('anonymous','forum');
+        } else {
+            $name = fullname($post, $viewfullnames);
+        }
+
+
         echo '<li><div class="head">'.
                '<div class="date">'.userdate($post->modified, $strftimerecent).'</div>'.
-               '<div class="name">'.fullname($post, $viewfullnames).'</div>'.
+               '<div class="name">'.$name.'</div>'.
              '</div>';
         echo '<div class="info'.$subjectclass.'">';
         if (empty($post->parent)) {
@@ -1917,7 +1999,7 @@ function forum_get_all_user_ratings($userid, $discussions) {
     $sql .=" ORDER BY p.id ASC";
 
     return get_records_sql($sql);
-    
+
 
 }
 
@@ -2521,7 +2603,7 @@ function forum_get_user_discussions($courseid, $userid, $groupid=0) {
 }
 
 /**
- * Get the list of potential subscribers to a forum. 
+ * Get the list of potential subscribers to a forum.
  *
  * @param object $forumcontext the forum context.
  * @param integer $groupid the id of a group, or 0 for all groups.
@@ -2590,6 +2672,71 @@ function forum_subscribed_users($course, $forum, $groupid=0, $context = NULL) {
     return $results;
 }
 
+/**
+ * Returns a list of users subscribed to a discussion
+ **/
+function forum_discussion_subscribed_users($course, $discussion, $groupid=0, $cache=false) {
+
+    global $CFG;
+
+    if ($groupid) {
+        $grouptables = ", {$CFG->prefix}groups_members gm ";
+        $groupselect = "AND gm.groupid = $groupid AND u.id = gm.userid";
+    } else  {
+        $grouptables = '';
+        $groupselect = '';
+    }
+
+    $forum = get_record('forum', 'id', $discussion->forum);
+
+    if (forum_is_forcesubscribed($forum->id)) {
+        $results = get_course_users($course->id); // Get everyone in the course
+    } else {
+        $results = get_records_sql("SELECT DISTINCT(u.id), u.username, u.firstname, u.lastname, u.maildisplay, u.mailformat, u.maildigest, u.emailstop,
+                                           u.email, u.city, u.country, u.lastaccess, u.lastlogin, u.picture, u.timezone, u.theme, u.lang, u.trackforums
+                                    FROM  {$CFG->prefix}user u,
+                                          {$CFG->prefix}forum_discussions d,
+                                          {$CFG->prefix}forum_discussion_subscripts ds $grouptables
+                                    WHERE ds.discussion = '$discussion->id'
+                                      AND ds.discussion = d.id
+                                      AND ds.userid = u.id
+                                      AND u.deleted <> 1 $groupselect
+                                    ORDER BY u.email ASC");
+    }
+
+    // Guest user should never be subscribed to a forum.
+    if ($guest = guest_user()) {
+        unset($results[$guest->id]);
+    }
+
+    return $results;
+}
+
+/**
+ * Returns a list of all users subscribed to a discussion or the forum it is in
+ **/
+function forum_discussion_subscribed_all_users($course, $discussion, $groupid=0, $cache=false) {
+
+    // Get the forum record
+    $forum = get_record('forum', 'id', $discussion->forum);
+
+    $discussion_subscribers = array();
+    $forum_subscribers = array();
+
+    // Get all users subscribed to the forum or the discussion
+    if (! $discussion_subscribers = forum_discussion_subscribed_users($course, $discussion, $groupid, $cache)) {
+        $discussion_subscribers = array();
+    }
+
+    if (! $forum_subscribers = forum_subscribed_users($course, $forum, $groupid, $cache)) {
+        $forum_subscribers = array();
+    }
+
+    // Union of subscribers
+    $result = $discussion_subscribers + $forum_subscribers;
+
+    return $result;
+}
 
 
 // OTHER FUNCTIONS ///////////////////////////////////////////////////////////
@@ -2691,7 +2838,15 @@ function forum_make_mail_post($course, $forum, $discussion, $post, $userfrom, $u
     $output = '<table border="0" cellpadding="3" cellspacing="0" class="forumpost">';
 
     $output .= '<tr class="header"><td width="35" valign="top" class="picture left">';
-    $output .= print_user_picture($userfrom, $course->id, $userfrom->picture, false, true);
+
+
+    $anonymous = get_field('forum','anonymous','id',$post->forum);
+    $reveal = get_field('forum_posts', 'reveal','discussion', $post->discussion, 'userid', $post->userid);
+    if ($reveal) { // preserve ability to use ternary operators
+        $anonymous = 0;
+    }
+
+    $output .= print_user_picture($anonymous ? 1 : $userfrom, $course->id, $userfrom->picture, false, true);
     $output .= '</td>';
 
     if ($post->parent) {
@@ -2701,9 +2856,10 @@ function forum_make_mail_post($course, $forum, $discussion, $post, $userfrom, $u
     }
     $output .= '<div class="subject">'.format_string($post->subject).'</div>';
 
-    $fullname = fullname($userfrom, $viewfullnames);
+    $fullname = $anonymous ? get_string('anonymous', 'forum') : fullname($userfrom, $viewfullnames);
     $by = new object();
-    $by->name = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$userfrom->id.'&amp;course='.$course->id.'">'.$fullname.'</a>';
+    $by->name = $anonymous ? '<a href="'.$CFG->wwwroot.'/user/view.php?id=1&amp;course='.$course->id.'">'.$fullname.'</a>' :
+        '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$course->id.'">'.$fullname.'</a>';
     $by->date = userdate($post->modified, '', $userto->timezone);
     $output .= '<div class="author">'.get_string('bynameondate', 'forum', $by).'</div>';
 
@@ -2892,8 +3048,15 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $postuser->imagealt  = $post->imagealt;
     $postuser->picture   = $post->picture;
 
+                          // Anonymous Code
+    $anonymous = get_field('forum','anonymous','id',$discussion->forum);
+    $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+    if ($reveal) { // preserve ability to use ternary operators
+        $anonymous = 0;
+    }
+
     echo '<tr class="header"><td class="picture left">';
-    print_user_picture($postuser, $course->id);
+    print_user_picture($anonymous ? 1 : $postuser, $course->id);
     echo '</td>';
 
     if ($post->parent) {
@@ -2911,8 +3074,15 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     echo '<div class="author">';
     $fullname = fullname($postuser, $cm->cache->caps['moodle/site:viewfullnames']);
     $by = new object();
-    $by->name = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.
-                $post->userid.'&amp;course='.$course->id.'">'.$fullname.'</a>';
+
+
+    if($anonymous) {
+         $by->name = '<a href="'.$CFG->wwwroot.'/user/view.php?id=1&amp;course='.$course->id.'">'.get_string('anonymous', 'forum').'</a>';
+    } else { // not anonymous
+         $by->name = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.
+         $post->userid.'&amp;course='.$course->id.'">'.$fullname.'</a>';
+    }
+
     $by->date = userdate($post->modified);
     print_string('bynameondate', 'forum', $by);
     echo '</div></td></tr>';
@@ -3181,15 +3351,49 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
     $postuser->imagealt = $post->imagealt;
     $postuser->picture = $post->picture;
 
+    $anonymous = get_field('forum','anonymous','id',$forum->id);
+    $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+    if ( !isset($anonymous) or !isset($reveal) ) {
+        error("anonymous varibles not set");
+    }
+    if ($reveal ) { // preserve ability to use ternary operators
+        $anonymous = 0;
+    }
+
     echo '<td class="picture">';
-    print_user_picture($postuser, $forum->course);
+    if($anonymous) {
+        // Show guest user account
+        print_user_picture(1, $forum->course, false,0,false,false);
+    } else {
+        print_user_picture($postuser, $forum->course);
+    }
     echo "</td>\n";
 
     // User name
     $fullname = fullname($post, has_capability('moodle/site:viewfullnames', $modcontext));
     echo '<td class="author">';
-    echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->userid.'&amp;course='.$forum->course.'">'.$fullname.'</a>';
+
+    if ($anonymous) {
+        $fullname = get_string('anonymous', 'forum');
+        echo '<a href="#">'.$fullname.'</a>';
+    } else { // not anonymous
+        echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->userid.'&amp;course='.$forum->course.'">'.$fullname.'</a>';
+    }
     echo "</td>\n";
+
+    // Subscribed
+    if (forum_is_forcesubscribed($forum->id)) {
+        // if we're forced subscribed, just print yes and no link
+        echo '<td class="subscribed">' . get_string('yes', 'moodle') . '</td>';
+    } else if (!isguestuser()) {
+        echo '<td class="subscribed"><a href="discussion_subscribe.php?d='. $post->discussion .'">';
+        if (forum_discussion_subscriber($USER->id, $post->discussion)) {
+            echo get_string('yes', 'moodle');
+        } else {
+            echo get_string('no', 'moodle');
+        }
+        echo "</a></td>\n";
+    }
 
     // Group picture
     if ($group !== -1) {  // Groups are active - group is a group data object or NULL
@@ -3245,8 +3449,11 @@ function forum_print_discussion_header(&$post, $forum, $group=-1, $datestring=""
     $usermodified->id        = $post->usermodified;
     $usermodified->firstname = $post->umfirstname;
     $usermodified->lastname  = $post->umlastname;
-    echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
-         fullname($usermodified).'</a><br />';
+     if ($anonymous) {
+        echo '<a href="'.$CFG->wwwroot.'/user/view.php?id=1&amp;course='.$forum->course.'">'.get_string('anonymous', 'forum').'</a><br />';
+    } else {
+        echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.fullname($usermodified).'</a><br />';
+    }
     echo '<a href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'">'.
           userdate($usedate, $datestring).'</a>';
     echo "</td>\n";
@@ -3347,7 +3554,7 @@ function forum_print_ratings($postid, $scale, $aggregatetype, $link=true, $ratin
             $strratings = get_string("ratings", "forum");
         }
 
-        $strratings .= ': ';
+         $strratings .= ': ';
 
         if ($link) {
             $strratings .= link_to_popup_window ("/mod/forum/report.php?id=$postid", "ratings", $agg, 400, 600, null, null, true);
@@ -3491,7 +3698,7 @@ function forum_get_ratings_max($postid, $scale, $ratings=NULL) {
     } else {
         $max = max($ratings);
 
-        if (isset($scale[$max])) {
+     if (isset($scale[$max])) {
             return $scale[$max]." ($count)";
         } else {
             return "$max ($count)";    // Should never happen, hopefully
@@ -3817,6 +4024,27 @@ function forum_move_attachments($discussion, $forumid) {
 }
 
 /**
+ * This function returns an array of attachments from the file directory
+ * @param $post Full post object
+ * @return array
+**/
+function forum_get_attachments($post) {
+
+    $returnarray = array();
+
+    if ($basedir = forum_file_area($post)) {
+        if ($files = get_directory_list($basedir)) {
+            foreach ($files as $file) {
+                if (is_file("$basedir/$file")) {
+                    $returnarray[] = $file;
+                }
+            }
+        }
+    }
+    return $returnarray;
+}
+
+/**
  * if return=html, then return a html string.
  * if return=text, then return a text-only string.
  * otherwise, print HTML for non-images, and return image HTML
@@ -3836,7 +4064,11 @@ function forum_print_attachments($post, $return=NULL) {
             foreach ($files as $file) {
                 $icon = mimeinfo("icon", $file);
                 $type = mimeinfo("type", $file);
-                $ffurl = get_file_url("$filearea/$file");
+                if ($CFG->slasharguments) {
+                    $ffurl = "$CFG->wwwroot/file.php/$filearea/$file";
+                } else {
+                    $ffurl = "$CFG->wwwroot/file.php?file=/$filearea/$file";
+                }
                 $image = "<img src=\"$CFG->pixpath/f/$icon\" class=\"icon\" alt=\"\" />";
 
                 if ($return == "html") {
@@ -3865,6 +4097,22 @@ function forum_print_attachments($post, $return=NULL) {
     return $imagereturn;
 }
 /**
+ * count attachments helper function for forum_add_attachment
+ * $post object
+ * does not yet catch errors will soon be replaced
+ * with table code
+ **/
+function attachment_count($post) {
+	// Coded this way for now later will count from database
+    if ($basedir = forum_file_area($post)) {
+        if ($files = get_directory_list($basedir)) {
+            return count($files);
+        }
+	}
+	return 0; // errors not yet handled
+}
+
+/**
  * If successful, this function returns the name of the file
  * @param $post is a full post record, including course and forum
  * @param $newfile is a full upload array from $_FILES
@@ -3886,12 +4134,34 @@ function forum_add_attachment($post, $inputname,&$message) {
         return "";
     }
 
+    // Check that the number of attachments is under the max
+    // so we don't go over when editing.
+    if ( $forum->multiattach and ( attachment_count($post) >= $forum->maxattach ) ) {
+    	return null;
+    }
+
+
     require_once($CFG->dirroot.'/lib/uploadlib.php');
-    $um = new upload_manager($inputname,true,false,$course,false,$forum->maxbytes,true,true);
+
+    if ($forum->multiattach) {
+        // $inputname is set to FILE for enumeration
+        $um = new upload_manager('', false, false, $course, true, $forum->maxbytes, true, true, false);
+    } else {
+        $um = new upload_manager($inputname,true,false,$course,false,$forum->maxbytes,true,true);
+    }
+
     $dir = forum_file_area_name($post);
     if ($um->process_file_uploads($dir)) {
         $message .= $um->get_errors();
-        return $um->get_new_filename();
+
+        // Populate the attachments table should occur here or very near here
+
+
+        if ($forum->multiattach) {
+            return $um->files['FILE_0']['name'];
+        } else {
+            return $um->get_new_filename();
+        }
     }
     $message .= $um->get_errors();
     return null;
@@ -4001,6 +4271,7 @@ function forum_add_discussion($discussion,&$message) {
     $post->course      = $forum->course; // speedup
     $post->format      = $discussion->format;
     $post->mailnow     = $discussion->mailnow;
+    $post->reveal      = $discussion->reveal;
 
     if (! $post->id = insert_record("forum_posts", $post) ) {
         return 0;
@@ -4060,6 +4331,12 @@ function forum_delete_discussion($discussion, $fulldelete=false) {
     }
 
     forum_tp_delete_read_records(-1, -1, $discussion->id);
+
+    if ($discussion_subscriptions = get_records('forum_discussion_subscripts', 'discussion', $discussion->id)) {
+        if (! delete_records('forum_discussion_subscripts', 'discussion', $discussion->id)) {
+            $result = false;
+        }
+    }
 
     if (! delete_records("forum_discussions", "id", "$discussion->id")) {
         $result = false;
@@ -4201,10 +4478,10 @@ function forum_unsubscribe($userid, $forumid) {
 function forum_post_subscription($post, $forum) {
 
     global $USER;
-    
+
     $action = '';
     $subscribed = forum_is_subscribed($USER->id, $forum);
-    
+
     if ($forum->forcesubscribe == FORUM_FORCESUBSCRIBE) { // database ignored
         return "";
 
@@ -4243,6 +4520,119 @@ function forum_post_subscription($post, $forum) {
         case 'unsubscribe':
             forum_unsubscribe($USER->id, $post->forum);
             return "<p>".get_string("nownotsubscribed", "forum", $info)."</p>";
+    }
+}
+
+/**
+ * Check if the user is subscribed to the discussion
+ *
+ * @param $userid The id of the user
+ * @param $discussionid The discussion id
+ * @return boolean True if the user is subscribed to the discussion, false if not
+ */
+function forum_discussion_is_subscribed($userid, $discussionid) {
+    return record_exists("forum_discussion_subscripts", "userid", $userid, "discussion", $discussionid);
+}
+
+/**
+ * Subscribe to a discussion
+ *
+ * @param $userid The id of the user to subscribe
+ * @param $discussionid The id of the discussion to subscribe to
+ * @return boolean Success of subscription
+ **/
+function forum_discussion_subscribe($userid, $discussionid) {
+
+    $discussion = get_record("forum_discussions", "id", $discussionid);
+
+    // Return if we're subscribed to the discussion already
+    if (forum_discussion_is_subscribed($userid, $discussion->id)) {
+        return true;
+    } else if (forum_is_subscribed($userid, $discussion->forum)) {
+    // Return if we're subscribed to the forum already
+        return true;
+    }
+
+    // Build table row and insert
+    $sub->userid = $userid;
+    $sub->discussion = $discussion->id;
+
+    return insert_record("forum_discussion_subscripts", $sub);
+}
+
+/**
+ * Tells if a user is subscribed to a discussion or its forum.
+ *
+ * @param $userid
+ * @param $discussionid
+ **/
+function forum_discussion_subscriber($userid, $discussionid) {
+    $discussion = get_record("forum_discussions", "id", $discussionid);
+
+    if (forum_is_subscribed($userid,$discussion->forum)) {
+        return true;
+    }
+
+    return record_exists("forum_discussion_subscripts", "userid", $userid, "discussion", $discussion->id);
+}
+
+
+/**
+ * Unsubscribe to a discussion
+ *
+ * @param $userid The id of the user to subscribe
+ * @param $discussionid The id of the discussion to unsubscribe from
+ * @return boolean Success of unsubscription
+ **/
+function forum_discussion_unsubscribe($userid, $discussionid) {
+
+    $discussion = get_record("forum_discussions", "id", $discussionid);
+
+    // If the user is subscribed to the forum, then
+    // unsubscribe them to the forum, and subscribe them to all discussions
+    if (forum_is_subscribed($userid, $discussion->forum)) {
+        forum_unsubscribe($userid, $discussion->forum);
+        forum_discussion_subscribe_all($userid, $discussion->forum);
+    } else if (!forum_discussion_is_subscribed($userid, $discussion->id)) {
+        // if we're subscribed to neither then we're done
+        return true;
+    }
+
+    // Now unsubscribe them from the discussion
+    return delete_records('forum_discussion_subscripts', 'userid', $userid, 'discussion', $discussion->id);
+}
+
+/**
+ * A helper function that subscribes a user to all the discussion in a forum
+ *
+ * @param $userid ID of the user to subscribe
+ * @param $forumid ID of the forum
+ **/
+function forum_discussion_subscribe_all($userid, $forumid) {
+    // Get a list of all the discussions
+    $discussions = forum_get_discussions($forumid);
+
+    // Subscribe to each discussion
+    foreach ($discussions as $id => $discussion) {
+        forum_discussion_subscribe($userid, $discussion->discussion);
+    }
+}
+
+/**
+ * A helper function that unsubscribes a user to all the discussion in a forum
+ *
+ * @param $userid ID of the user to subscribe
+ * @param $forumid ID of the forum
+ **/
+function forum_discussion_unsubscribe_all($userid, $forumid) {
+
+    $cm = get_coursemodule_from_instance('forum', $forumid);
+    // Get a list of all the discussions
+    $discussions = forum_get_discussions($cm);
+
+    // Unsubscribe to each discussion
+    foreach ($discussions as $id => $discussion) {
+        forum_discussion_unsubscribe($userid, $discussion->discussion);
     }
 }
 
@@ -4349,7 +4739,7 @@ function forum_get_tracking_link($forum, $messages=array(), $fakelink=true) {
     } else {
         $linktitle = $strtrackforum;
         $linktext = $strtrackforum;
-    } 
+    }
 
     $link = '';
     if ($fakelink) {
@@ -4421,8 +4811,8 @@ function forum_user_has_posted($forumid, $did, $userid) {
         return record_exists_sql($sql);
     } else {
         // started discussion?
-        return record_exists('forum_posts','discussion',$did,'userid',$userid);
-    }
+    return record_exists('forum_posts','discussion',$did,'userid',$userid);
+}
 }
 
 /**
@@ -4446,6 +4836,11 @@ function forum_user_can_post_discussion($forum, $currentgroup=null, $unused=-1, 
 
     if (!$context) {
         $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    }
+
+    // normal users with temporary guest access can not add discussions
+    if (has_capability('moodle/legacy:guest', $context, $USER->id, false)) {
+        return false;
     }
 
     if ($currentgroup === null) {
@@ -4854,12 +5249,34 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
         $unreads = array();
     }
 
+    //Check to see if the user has specified expandable forum view.
+    //If so, use js to write tags for the the expand all collapse all links
+    //That way if js is disabled they won't show up
+
+    // Don't print links if we're on the front page
+    $expandable = false;
+    if ($course->id != SITEID) {
+        if ($expandable = get_user_preferences('forumview',0)) {
+            require_js(array('yui_yahoo', 'yui_event', 'yui_treeview'));
+            echo '<script type="text/javascript">'."\n";
+            echo ' document.write("<div id=\"expandcontractdiv\">");'."\n";
+            echo 'document.write("<p>[<a id=\"expand\" href=\"#\">Expand all</a>] ");'."\n";
+            echo 'document.write("[<a id=\"collapse\" href=\"#\">Collapse all</a>]");';
+            echo 'document.write("'. addslashes_js(helpbutton('expandcollapseall', get_string('expand', 'forum'), 'forum', true, false, '', true)) . '</p>");'."\n";
+            echo 'document.write("</div>");'."\n";
+            echo '</script>'."\n";
+        }
+    }
+
     if ($displayformat == 'header') {
         echo '<table cellspacing="0" class="forumheaderlist">';
         echo '<thead>';
         echo '<tr>';
         echo '<th class="header topic" scope="col">'.get_string('discussion', 'forum').'</th>';
         echo '<th class="header author" colspan="2" scope="col">'.get_string('startedby', 'forum').'</th>';
+        if (!isguestuser()) {
+            echo '<th class="header subscribed" scope="col">' . get_string('subscribed', 'forum').'</th>';
+        }
         if ($groupmode > 0) {
             echo '<th class="header group" scope="col">'.get_string('group').'</th>';
         }
@@ -4881,6 +5298,27 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
         echo '</tr>';
         echo '</thead>';
         echo '<tbody>';
+    }
+
+    //If the expandable view has been select by the user use js to close the tbody and table tags
+    //because the YUI tree view creates its own tables; one for each tree branch.
+    //If js is disabled the tags won't get closed so that the non-js expandable table can
+    //be built into it.
+    if ($expandable) {
+        echo '<script type="text/javascript">'."\n";
+        echo 'document.write("</tbody>");'."\n";
+        echo 'document.write("</table>");'."\n";
+        echo 'document.write("<div id=\"treeDiv2\"></div>");'."\n";
+        echo 'function treeInit() {';
+        echo 'var fortree = new YAHOO.widget.TreeView("treeDiv2");'."\n";
+        echo 'YAHOO.util.Event.on("expand", "click", function(e) {
+                fortree.expandAll();
+                YAHOO.util.Event.preventDefault(e); });'."\n";
+        echo 'YAHOO.util.Event.on("collapse", "click", function(e) {
+                fortree.collapseAll();
+                YAHOO.util.Event.preventDefault(e); });'."\n";
+        echo 'var root = fortree.getRoot();'."\n";
+        $noscripttext = '';
     }
 
     foreach ($discussions as $discussion) {
@@ -4924,8 +5362,14 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
                 } else {
                     $group = -1;
                 }
-                forum_print_discussion_header($discussion, $forum, $group, $strdatestring, $cantrack, $forumtracked,
+                //If expandable view has been set call the expandable function
+                if ($expandable) {
+                    $noscripttext .= forum_print_expandable_discussion_header($discussion, $forum, $group, $strdatestring, $cantrack, $forumtracked,
+                    $canviewparticipants);
+                } else {
+                    forum_print_discussion_header($discussion, $forum, $group, $strdatestring, $cantrack, $forumtracked,
                     $canviewparticipants, $context);
+                }
             break;
             default:
                 $link = false;
@@ -4945,8 +5389,19 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
     }
 
     if ($displayformat == "header") {
-        echo '</tbody>';
-        echo '</table>';
+        if (!$expandable) {
+            echo '</tbody>';
+            echo '</table>';
+        } else {
+            echo 'fortree.draw(); }'."\n";
+            echo 'treeInit();'."\n";
+            echo '</script>'."\n";
+            echo '<noscript>'."\n";
+            echo ($noscripttext)."\n";
+            echo '</tbody>';
+            echo '</table>';
+            echo '</noscript>'."\n";
+        }
     }
 
     if ($olddiscussionlink) {
@@ -5166,6 +5621,13 @@ function forum_print_posts_threaded($course, &$cm, $forum, $discussion, $parent,
 
         foreach ($posts as $post) {
 
+            // Set up Anonymous Varibles per post
+            $anonymous = get_field('forum','anonymous','id',$forum->id);
+            $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+            if ($reveal) { // preserve ability to use ternary operators
+                $anonymous = 0;
+            }
+
             echo '<div class="indent">';
             if ($depth > 0) {
                 $ownpost = ($USER->id == $post->userid);
@@ -5183,7 +5645,7 @@ function forum_print_posts_threaded($course, &$cm, $forum, $discussion, $parent,
                     continue;
                 }
                 $by = new object();
-                $by->name = fullname($post, $canviewfullnames);
+                $by->name = $anonymous ? get_string('anonymous', 'forum') : fullname($post, $canviewfullnames);
                 $by->date = userdate($post->modified);
 
                 if ($forumtracked) {
@@ -5245,6 +5707,138 @@ function forum_print_posts_nested($course, &$cm, $forum, $discussion, $parent, $
         }
     }
     return $ratingsmenuused;
+}
+
+/**
+ * Prints the next and previous topic navigation links.
+ *
+ * @param int $discussion The current discussion id
+ **/
+function forum_print_topic_nav($discussionid) {
+
+    global $CFG;
+
+    // get info about the current discussion, post and user
+    $discussion = get_record_sql("SELECT d.id, d.forum, d.timemodified, p.created, u.firstname, u.lastname
+                                    FROM {$CFG->prefix}forum_discussions d,
+                                         {$CFG->prefix}forum_posts p,
+                                         {$CFG->prefix}user u
+                                   WHERE
+                                         d.id = $discussionid
+                                     AND p.discussion = d.id
+                                     AND p.parent = 0
+                                     AND d.userid = u.id");
+
+    $sortorder = get_user_preferences("forum_sortorder", 0);
+
+    // Define select and order terms depending on sort order in user preferences
+    switch ($sortorder) {
+        case FORUM_SORT_FIRSTNAME:
+            // Select next in first name or next discussion created by the same user
+            $nextselect = "(u.firstname < '$discussion->firstname' OR (u.firstname = '$discussion->firstname' AND d.id < $discussion->id))";
+            $nextorderby = "u.firstname DESC, d.id DESC";
+
+            $prevselect = "(u.firstname > '$discussion->firstname' OR (u.firstname = '$discussion->firstname' AND d.id > $discussion->id))";
+            $prevorderby = "u.firstname ASC, d.id ASC";
+            break;
+        case FORUM_SORT_LASTNAME:
+            // Select next in last name or next discussion created by the same user
+            $nextselect = "(u.lastname < '$discussion->lastname' OR (u.lastname = '$discussion->lastname' AND d.id < $discussion->id))";
+            $nextorderby = "u.lastname DESC, d.id DESC";
+
+            $prevselect = "(u.lastname > '$discussion->lastname' OR (u.lastname = '$discussion->lastname' AND d.id > $discussion->id))";
+            $prevorderby = "u.lastname ASC, d.id ASC";
+            break;
+        case FORUM_SORT_OLDCREATED:
+            $nextselect = "p.created < $discussion->created";
+            $nextorderby = "p.created DESC";
+
+            $prevselect = "p.created > $discussion->created";
+            $prevorderby = "p.created ASC";
+            break;
+        case FORUM_SORT_NEWCREATED:
+            $nextselect = "p.created > $discussion->created";
+            $nextorderby = "p.created ASC";
+
+            $prevselect = "p.created < $discussion->created";
+            $prevorderby = "p.created DESC";
+            break;
+        case FORUM_SORT_NEWESTREPLY:
+            //fall through
+        default:
+            $nextselect = "d.timemodified > $discussion->timemodified";
+            $nextorderby = "d.timemodified ASC";
+
+            $prevselect = "d.timemodified < $discussion->timemodified";
+            $prevorderby = "d.timemodified DESC";
+            break;
+    }
+
+    // select the forward id and topic
+    $nextsql = get_record_sql("SELECT d.id, d.name
+                                 FROM {$CFG->prefix}forum_discussions d,
+                                      {$CFG->prefix}forum_posts p,
+                                      {$CFG->prefix}user u
+                                WHERE d.forum = $discussion->forum
+                                  AND d.userid = u.id
+                                  AND p.discussion = d.id
+                                  AND p.parent = 0
+                                  AND $nextselect
+                             ORDER BY $nextorderby", true);
+    if ($nextsql) {
+        $nextid = $nextsql->id;
+        $nexttitle = $nextsql->name;
+    }
+
+    // select the previous id and topic
+    $prevsql = get_record_sql("SELECT d.id, d.name
+                                 FROM {$CFG->prefix}forum_discussions d,
+                                      {$CFG->prefix}forum_posts p,
+                                      {$CFG->prefix}user u
+                                WHERE d.forum = $discussion->forum
+                                  AND d.userid = u.id
+                                  AND p.discussion = d.id
+                                  AND p.parent = 0
+                                  AND $prevselect
+                             ORDER BY $prevorderby", true);
+
+    if ($prevsql) {
+        $previd = $prevsql->id;
+        $prevtitle = $prevsql->name;
+    }
+
+    // truncate the strings and add elipses if needed...
+    $trimto = $CFG->forum_maxtopicchars;
+
+    if (!empty($nexttitle) && $trimto < strlen($nexttitle) ) {
+        $nexttitle = trim(substr($nexttitle, 0, $trimto)) . '...';
+    }
+
+    if (!empty($prevtitle) && $trimto < strlen($prevtitle) ) {
+        $prevtitle = trim(substr($prevtitle, 0, $trimto)) . '...';
+    }
+
+    // build and print the topic links
+    $prev = '<div class="forumprevtopic">';
+    if (!empty($previd)) {
+        $prev .= '<a title="' . get_string('prevtopic', 'forum') . $prevtitle . '" href="' .
+            $CFG->wwwroot . '/mod/forum/discuss.php?d=' . $previd . '">' .
+            get_string('prevtopic', 'forum') . $prevtitle . '</a>';
+    }
+    $prev .= '</div>';
+
+    $next = '<div class="forumnexttopic">&nbsp;';
+    if (!empty($nextid)) {
+        $next .= '<a title="' . get_string('nexttopic', 'forum') . $nexttitle . '" href="' .
+            $CFG->wwwroot . '/mod/forum/discuss.php?d=' . $nextid . '">' .
+            get_string('nexttopic', 'forum') . $nexttitle . '</a>';
+    }
+    $next .= '</div>';
+
+    echo '<div class="forumtopicnav">';
+    echo format_text($prev);
+    echo format_text($next);
+    echo '</div>';
 }
 
 /**
@@ -5340,6 +5934,7 @@ function forum_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
 
         $tmpactivity->type         = 'forum';
         $tmpactivity->cmid         = $cm->id;
+        $tmpactivity->instance     = $post->instance;
         $tmpactivity->name         = $aname;
         $tmpactivity->sectionnum   = $cm->sectionnum;
         $tmpactivity->timestamp    = $post->modified;
@@ -5350,13 +5945,20 @@ function forum_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
         $tmpactivity->content->subject    = format_string($post->subject);
         $tmpactivity->content->parent     = $post->parent;
 
+        // Check for anonymous status
+        $anonymous = get_field('forum','anonymous','id',$post->instance); // instance is forum id
+        $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+        if ($reveal) { // preserve ability to use ternary operators
+            $anonymous = 0;
+        }
+
         $tmpactivity->user = new object();
         $tmpactivity->user->id        = $post->userid;
-        $tmpactivity->user->firstname = $post->firstname;
-        $tmpactivity->user->lastname  = $post->lastname;
-        $tmpactivity->user->picture   = $post->picture;
-        $tmpactivity->user->imagealt  = $post->imagealt;
-        $tmpactivity->user->email     = $post->email;
+        $tmpactivity->user->firstname = $anonymous ? get_string('anonymous','forum') : $post->firstname;
+        $tmpactivity->user->lastname  = $anonymous ? get_string('anonymous','forum') : $post->lastname;
+        $tmpactivity->user->picture   = $anonymous ? 0 : $post->picture;
+        $tmpactivity->user->imagealt  = $anonymous ? get_string('anonymous','forum') : $post->imagealt;
+        $tmpactivity->user->email     = $anonymous ? get_string('anonymous','forum') : $post->email;
 
         $activities[$index++] = $tmpactivity;
     }
@@ -5369,6 +5971,16 @@ function forum_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
  */
 function forum_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
     global $CFG;
+
+    $anonymous = get_field('forum','anonymous','id',$activity->instance);
+    $reveal = get_field('forum_posts', 'reveal','id',$activity->content->id);
+    if ($reveal) { // preserve ability to use ternary operators
+        $anonymous = 0;
+    }
+    if ($anonymous) {
+        $activity->user->userid = 1;
+        $activity->user->fullname = get_string('anonymous','forum');
+    }
 
     if ($activity->content->parent) {
         $class = 'reply';
@@ -5432,6 +6044,27 @@ function forum_update_subscriptions_button($courseid, $forumid) {
 
     return "<form $CFG->frametarget method=\"get\" action=\"$CFG->wwwroot/mod/forum/subscribers.php\">".
            "<input type=\"hidden\" name=\"id\" value=\"$forumid\" />".
+           "<input type=\"hidden\" name=\"edit\" value=\"$edit\" />".
+           "<input type=\"submit\" value=\"$string\" /></form>";
+}
+
+/**
+ * JSK: TODO can't we combine these someway!?
+ * Prints the editing button on discussion_subscribers page
+ */
+function forum_update_discussion_subscriptions_button($courseid, $discussionid) {
+    global $CFG, $USER;
+
+    if (!empty($USER->subscriptionsediting)) {
+        $string = get_string('turneditingoff');
+        $edit = "off";
+    } else {
+        $string = get_string('turneditingon');
+        $edit = "on";
+    }
+
+    return "<form $CFG->frametarget method=\"get\" action=\"$CFG->wwwroot/mod/forum/discussion_subscribers.php\">".
+           "<input type=\"hidden\" name=\"id\" value=\"$discussionid\" />".
            "<input type=\"hidden\" name=\"edit\" value=\"$edit\" />".
            "<input type=\"submit\" value=\"$string\" /></form>";
 }
@@ -6111,7 +6744,7 @@ function forum_tp_count_forum_unread_posts($cm, $course) {
         $mygroups = $modinfo->groups[0];
     } else {
         if (array_key_exists($cm->groupingid, $modinfo->groups)) {
-            $mygroups = $modinfo->groups[$cm->groupingid];
+        $mygroups = $modinfo->groups[$cm->groupingid];
         } else {
             $mygroups = false; // Will be set below
         }
@@ -6922,6 +7555,327 @@ function forum_get_open_modes() {
     return array ('2' => get_string('openmode2', 'forum'),
                   '1' => get_string('openmode1', 'forum'),
                   '0' => get_string('openmode0', 'forum') );
+}
+
+//Function prints each discussion of the forum in the expandable forum display option
+//Adapted from forum_print_discussion_header
+function forum_print_expandable_discussion_header(&$post, $forum, $group=-1, $datestring="",
+                                        $cantrack=true, $forumtracked=true, $canviewparticipants=true) {
+
+    global $USER, $CFG;
+
+    static $rowcount;
+    static $strmarkalldread;
+
+   $colcount = 5;
+   $colclass = 'five';
+   $colcount = $group !== -1 ? $colcount+1 : $colcount;
+   $colcount = $cantrack ? $colcount+1 : $colcount;
+
+   switch ($colcount) {
+       case 6:
+           $colclass = 'six';
+           break;
+       case 7:
+           $colclass = 'seven';
+           break;
+   }
+
+    if (!$cm = get_coursemodule_from_instance('forum', $forum->id, $forum->course)) {
+        error('Course Module ID was incorrect');
+    }
+    $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+
+    // Set up Anonymous Varibles
+    $anonymous = get_field('forum','anonymous','id',$forum->id);
+    $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+    if( $reveal ) { // preserve ability to use ternary operators
+        $anonymous = 0;
+    }
+
+    if (!isset($rowcount)) {
+        $rowcount = 0;
+        $strmarkalldread = get_string('markalldread', 'forum');
+    } else {
+        $rowcount = ($rowcount + 1) % 2;
+    }
+
+    $post->subject = format_string($post->subject,true);
+
+    $nodetext = "";
+    //$nodetext .= '<tr class="discussion r'.$rowcount.'">';
+
+    // Topic
+    if ($cantrack) {
+        $nodetext .= '<td class=\"topic starter '.$colclass.'\">';
+    } else {
+        $nodetext .= '<td class=\"topic starter '.$colclass.'\">';
+    }
+    $nodetext .= '<a href=\"'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.'\">'.addslashes_js($post->subject).'</a>';
+    $nodetext .= "</td>";
+
+    // Picture
+    $nodetext .= '<td class=\"picture\">';
+    $nodetext .= addslashes(print_user_picture($anonymous ? 1 :$post->userid, $forum->course, $post->picture, 0, true));
+    $nodetext .= "</td>";
+
+    // User name
+    $fullname = fullname($post, has_capability('moodle/site:viewfullnames', $modcontext));
+    $nodetext .= '<td class=\"author\">';
+
+    // Prob a better way to recode this part.
+    $nodetext .= '<a href=\"'.$CFG->wwwroot.'/user/view.php?id=';
+    $nodetext .= $anonymous ? 1:$post->userid;
+    $nodetext .= '&amp;course=';
+    $nodetext .= $forum->course .'\">';
+    $nodetext .= $anonymous ? get_string('anonymous','forum') : $fullname;
+    $nodetext .= '</a>';
+
+    //$nodetext .= '<a href=\"'.$CFG->wwwroot.'/user/view.php?id='.$post->userid.'&amp;course='.$forum->course.'\">'.$fullname.'</a>';
+    $nodetext .= "</td>";
+
+    // Subscribed
+    if (forum_is_forcesubscribed($forum->id)) {
+        // if we're forced subscribed, just print yes and no link
+        $nodetext .= '<td class=\"subscribed\">' . get_string('yes', 'moodle') . '</td>';
+    } else if (!isguestuser()) {
+        $nodetext .= '<td class=\"subscribed\"><a href=\"discussion_subscribe.php?d='. $post->discussion .'\">';
+        if (forum_discussion_subscriber($USER->id, $post->discussion)) {
+            $nodetext .= get_string('yes', 'moodle');
+        } else {
+            $nodetext .= get_string('no', 'moodle');
+        }
+        $nodetext .= "</a></td>";
+    }
+
+    // Group picture
+    if ($group !== -1) {  // Groups are active - group is a group data object or NULL
+        $nodetext .= '<td class=\"picture group\">';
+        if (!empty($group->picture) and empty($group->hidepicture)) {
+            $nodetext .= addslashes(print_group_picture($group, $forum->course, false, true, true));
+        } else if (isset($group->id)) {
+            if($canviewparticipants) {
+                $nodetext .= '<a href=\"'.$CFG->wwwroot.'/user/index.php?id='.$forum->course.'&amp;group='.$group->id.'\">'.addslashes_js($group->name).'</a>';
+            } else {
+                $nodetext .= $group->name;
+            }
+        }
+        $nodetext .= "</td>";
+    }
+
+    if (has_capability('mod/forum:viewdiscussion', $modcontext)) {   // Show the column with replies
+        $nodetext .= '<td class=\"replies\">';
+        $nodetext .= '<a href=\"'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.'\">';
+        $nodetext .= $post->replies.'</a>';
+        $nodetext .= "</td>";
+
+        if ($cantrack) {
+            $nodetext .= '<td class=\"replies\">';
+            if ($forumtracked) {
+                if ($post->unread > 0) {
+                    $nodetext .= '<span class=\"unread\">';
+                    $nodetext .= '<a href=\"'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.'#unread\">';
+                    $nodetext .= $post->unread;
+                    $nodetext .= '</a>';
+                    $nodetext .= '<a title=\"'.$strmarkalldread.'\" href=\"'.$CFG->wwwroot.'/mod/forum/markposts.php?f='.
+                         $forum->id.'&amp;d='.$post->discussion.'&amp;mark=read&amp;returnpage=view.php\">' .
+                         '<img src=\"'.$CFG->pixpath.'/t/clear.gif\" class=\"iconsmall\" alt=\"'.$strmarkalldread.'\" /></a>';
+                    $nodetext .= '</span>';
+                } else {
+                    $nodetext .= '<span class=\"read\">';
+                    $nodetext .= $post->unread;
+                    $nodetext .= '</span>';
+                }
+            } else {
+                $nodetext .= '<span class=\"read\">';
+                $nodetext .= '-';
+                $nodetext .= '</span>';
+            }
+            $nodetext .= "</td>";
+        }
+    }
+
+    $nodetext .= '<td class=\"lastpost\">';
+    $usedate = (empty($post->timemodified)) ? $post->modified : $post->timemodified;  // Just in case
+    $parenturl = (empty($post->lastpostid)) ? '' : '&amp;parent='.$post->lastpostid;
+    $usermodified->id        = $post->usermodified;
+    $usermodified->firstname = $post->umfirstname;
+    $usermodified->lastname  = $post->umlastname;
+
+    if ($anonymous) {
+        $nodetext .= '<a href=\"'.$CFG->wwwroot.'/user/view.php?id=1&amp;course='.$forum->course.'\">'.get_string('anonymous', 'forum').'</a><br />';
+    } else {
+        $nodetext .= '<a href=\"'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'\">'.fullname($usermodified).'</a><br />';
+    }
+
+
+    //    $nodetext .= '<a href=\"'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'\">'.
+    //         fullname($usermodified).'</a><br />';
+    $nodetext .= '<a href=\"'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.$post->discussion.$parenturl.'\">'.
+          userdate($usedate, $datestring).'</a>';
+    $nodetext .= "</td>";
+
+    echo 'var nodetext = { html: "'.$nodetext.'" };';
+    echo 'var discNode = new YAHOO.widget.HTMLNode(nodetext, root, false, true);';
+    echo 'discNode.labelStyle = "forumheaderlist";';
+    if ($forumtracked) {
+       $user_read_array = forum_tp_get_discussion_read_records($USER->id, $post->discussion);
+    } else {
+       $user_read_array = array();
+    }
+    $posthtml = (forum_expandable_post($post, $forum->course, true, false, $footer="", $user_read_array));
+    echo 'var posttext = { html: "'.addslashes_js($posthtml).'" };';
+    echo 'var postNode = new YAHOO.widget.HTMLNode(posttext, discNode, false);';
+
+    return '<tr>'.stripslashes($nodetext).'</tr>'.'<tr>' . $posthtml.'</tr>';
+}
+
+//This function creates the post content for use with the expandable forum display option
+//Adapted from forum_print_post
+function forum_expandable_post(&$post, $courseid, $reply=false, $rate=false, $footer="",$user_read_array) {
+
+
+    global $CFG, $USER;
+
+    $post->forum = get_field('forum_discussions', 'forum', 'id', $post->discussion);
+
+    if (!$cm = get_coursemodule_from_instance('forum', $post->forum)) {
+        mtrace('Course Module ID was incorrect');
+    }
+    $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+
+//    // Set up Anonymous Varibles
+//    $anonymous = get_field('forum','anonymous','id',$post->forum);
+//  $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+//  if( $reveal ) { // preserve ability to use ternary operators
+//      $anonymous = 0;
+//  }
+
+    $select = "id = $post->id";
+    $morepost = get_record_select('forum_posts', $select, 'message, format, created, attachment, parent');
+    $post->message = $morepost->message;
+    $post->format = $morepost->format;
+    $post->attachment = $morepost->attachment;
+    $post->parent = $morepost->parent;
+    $post->created = $morepost->created;
+
+    // format the post body
+    $options = new object();
+    $options->para = true;
+    $formattedtext = format_text(trusttext_strip($post->message), $post->format, $options, $courseid);
+
+    $output = '<td class="content">';
+
+    if ($post->attachment) {
+        $post->course = $courseid;
+        $output .= '<div class="attachments">';
+        $output .= forum_print_attachments($post, 'html');
+        $output .= "</div>";
+    }
+
+    $output .= $formattedtext;
+
+// Commands
+    $commands = array();
+
+    if ($post->parent) {
+        $commands[] = '<a target="_blank" href="'.$CFG->wwwroot.'/mod/forum/discuss.php?d='.
+                      $post->discussion.'&amp;parent='.$post->parent.'">'.get_string('parent', 'forum').'</a>';
+    }
+    $age = time() - $post->created;
+    $ownpost = ($USER->id == $post->userid);
+    $editanypost = has_capability('mod/forum:editanypost', $modcontext);
+    if ($ownpost or $editanypost) {
+        if (($age < $CFG->maxeditingtime) or $editanypost) {
+            $commands[] =  '<a href="'.$CFG->wwwroot.'/mod/forum/post.php?edit='.$post->id.'">'.get_string('edit', 'forum').'</a>';
+        }
+    }
+
+    if (($ownpost and ($age < $CFG->maxeditingtime)
+                and has_capability('mod/forum:deleteownpost', $modcontext))
+                or has_capability('mod/forum:deleteanypost', $modcontext)) {
+        $commands[] = '<a href="'.$CFG->wwwroot.'/mod/forum/post.php?delete='.$post->id.'">'.get_string('delete').'</a>';
+    }
+
+    if ($reply) {
+        $commands[] = '<a target="_blank" href="'.$CFG->wwwroot.'/mod/forum/post.php?reply='.$post->id.'">'.
+                      get_string('reply', 'forum').'</a>';
+    }
+
+    $output .= '<div class="commands">';
+    $output .= implode(' | ', $commands);
+    $output .= '</div>';
+
+// Context link to post if required
+
+    if ($footer) {
+        $output .= '<div class="footer">'.$footer.'</div>';
+    }
+    $output .= forum_print_expandable_posts_threaded($post->id, $courseid, 0, $reply, $post->forum, $user_read_array);
+    $output .= '</td>';
+    return $output;
+}
+
+//Creates the threaded posts content for the posts in the expandable forum display
+//Adapted from forum_print_posts_threaded
+function forum_print_expandable_posts_threaded($parent, $courseid, $depth, $reply, $forumid=0, $user_read_array) {
+    global $USER, $CFG;
+
+    $link  = false;
+    $ratingsmenuused = false;
+
+    $forum = get_record('forum', 'id', $forumid);
+
+    $istracking = forum_tp_can_track_forums($forum) && forum_tp_is_tracked($forum);
+
+     $output = '';
+
+    if ($posts = forum_get_child_posts($parent, $forumid)) {
+
+        if (!$cm = get_coursemodule_from_instance('forum', $forumid, $courseid)) {
+            error('Course Module ID was incorrect');
+        }
+        $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $canviewfullnames = has_capability('moodle/site:viewfullnames', $modcontext);
+
+
+        foreach ($posts as $post) {
+
+                // Set up Anonymous Varibles (per post)
+                $anonymous = get_field('forum','anonymous','id',$forumid);
+                $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+                if( $reveal ) { // preserve ability to use ternary operators
+                    $anonymous = 0;
+                }
+
+                $output .= '<div class="indent">';
+                if (!forum_user_can_see_post($post->forum,$post->discussion,$post)) {
+                    continue;
+                }
+                $by->name = $anonymous ? get_string('anonymous','forum') :fullname($post, $canviewfullnames);
+                $by->date = userdate($post->modified);
+
+                if ($istracking) {
+                    if (isset($user_read_array[$post->id]) || forum_tp_is_post_old($post)) {
+                        $style = '<span class="forumthread read">';
+                    } else {
+                            $style = '<span class="forumthread unread">';
+                    }
+                } else {
+                        $style = '<span class="forumthread">';
+                  }
+                $output .= $style."<a name=\"$post->id\"></a>".
+                         "<a href=\"discuss.php?d=$post->discussion&amp;parent=$post->id\">".format_string($post->subject,true)."</a> ";
+                $output .= get_string("bynameondate", "forum", $by);
+                $output .=  "</span>";
+
+                if ($output .= forum_print_expandable_posts_threaded($post->id, $courseid, $depth-1, $reply, $forumid, $user_read_array)) {
+
+                }
+                $output .= "</div>\n";
+        }
+    }
+    return $output;
 }
 
 /**

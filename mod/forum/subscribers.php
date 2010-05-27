@@ -140,10 +140,10 @@
             if (strpos(moodle_strtolower($user->email), $lcsearchtext) !== false ||
                     strpos(moodle_strtolower($user->firstname . ' ' . $user->lastname), $lcsearchtext) !== false) {
                 $searchusers[$userid] = $user;
-            }
+    }
             unset($users[$userid]);
         }
-    }
+        }
 
     print_simple_box_start('center');
 

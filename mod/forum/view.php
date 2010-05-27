@@ -1,4 +1,4 @@
-<?php  // $Id$
+<?php  // $Id: view.php,v 1.106.2.15 2008/04/19 10:47:42 skodak Exp $
 
     require_once('../../config.php');
     require_once('lib.php');
@@ -12,7 +12,9 @@
     $changegroup = optional_param('group', -1, PARAM_INT);   // choose the current group
     $page        = optional_param('page', 0, PARAM_INT);     // which page to show
     $search      = optional_param('search', '');             // search string
-
+    $resetanony  = optional_param('resetanony', 0, PARAM_INT);// confirmation for change of anonymous 
+    $sort        = optional_param('sort', 0, PARAM_INT);
+    
 
     $buttontext = '';
 
@@ -41,6 +43,9 @@
         if (! $course = get_record("course", "id", $forum->course)) {
             error("Forum is misconfigured - don't know what course it's from");
         }
+
+        $strforums = get_string("modulenameplural", "forum");
+        $strforum = get_string("modulename", "forum");
 
         if (!$cm = get_coursemodule_from_instance("forum", $forum->id, $course->id)) {
             error("Course Module missing");
@@ -94,8 +99,31 @@
     } else {
         add_to_log($course->id, "forum", "view forum", "view.php?f=$forum->id", "$forum->id");
     }
-
-
+    
+/// find out sorting preference
+    if ($sort) { 
+        set_user_preference('forum_sortorder', $sort);
+    }
+    $sortorder = get_user_preferences('forum_sortorder', FORUM_SORT_NEWESTREPLY);
+    
+    switch ($sortorder) { 
+        case FORUM_SORT_FIRSTNAME:
+            $forumsort = "u.firstname";
+            break;
+        case FORUM_SORT_LASTNAME:
+            $forumsort = "u.lastname";
+            break;
+        case FORUM_SORT_OLDCREATED:
+            $forumsort = "p.created ASC";
+            break;
+        case FORUM_SORT_NEWCREATED:
+            $forumsort = "p.created DESC";
+            break;
+        case FORUM_SORT_NEWESTREPLY: 
+            // fall through
+        default:
+            $forumsort = "d.timemodified DESC";
+    }
 
 /// Print settings and things across the top
 
@@ -191,8 +219,38 @@
 //        print_box_end(); // subscription
 
     }
+    
+    if (has_capability('mod/forum:viewposters', $context)) {
+           $viewposterslink2 = "<a href=\"viewposters.php?id=$id&f=$forum->id\">".get_string('viewposters','forum')."</a>";
+           $viewposterslink = '<a title="View Posters" href="viewposters.php?id='.$id.'&amp;f='.$forum->id.'">'.get_string('viewposters','forum').'</a>';
+           echo "<div class=\"helplink\">$viewposterslink2</div>";
+    }
 //    print_box_end(); // subscription
-    echo '</div>';
+	echo '</div>';
+
+    if ($forum->type != 'single') {
+    	echo "<div class=\"forumsortorder\"><br />"; 
+        popup_form("view.php?f=$forum->id&amp;sort=", $FORUM_SORT_MODES, "sort", $sortorder, '');
+        helpbutton('sortorder', get_string('sortorder', 'forum'), 'forum');
+        echo '</div>';
+    }
+    
+    $anydiscussions = get_records('forum_discussions', 'forum', $forum->id, '', 'id', 0, 1);
+    if ($anydiscussions and has_capability('mod/forum:viewposters', $context)) {
+    	$actionoptions = array(
+    					   'downloadlabel' => get_string('downloadlabel', 'forum'),
+    					   'txt' => get_string('csv', 'forum'),
+    					   'ods' => get_string('ods', 'forum'),
+    					   'xls' => get_string('xls', 'forum'),
+    					   'enddllabel' => '--',
+    					   'printlabel' => get_string('printlabel', 'forum'),
+    					   'print' => get_string('print', 'forum'),
+    					   'endprintlabel' => '--'
+    					 );
+    	echo "<div class=\"forumactions\">";
+    	popup_form("export/export.php?f=$forum->id&amp;sort=$sortorder&amp;action=", $actionoptions, 'forumactions', '', get_string('chooseaction', 'forum'));
+    	echo "</div>";
+    }
 
 //    print_box_end();  // forumcontrol
 
@@ -208,6 +266,43 @@
     if ($forum->type == 'qanda' && !has_capability('moodle/course:manageactivities', $context)) {
         notify(get_string('qandanotify','forum'));
     }
+    
+    /// Anonymous Status Change Warning Code 
+    if (has_capability('moodle/course:manageactivities', $context)) {
+        // Obtain varible to tell us if this forum was last changed
+        // from anonymous to anonymous in which case we want to 
+        // confirm the change
+        $anonymous_change = get_config($forum->id,'anonymous_change');
+        if (isset($anonymous_change)) {
+             $anonymous = get_field('forum','anonymous','id',$forum->id); 
+             if (isset($anonymous)) {
+                if ($resetanony and confirm_sesskey()) {
+                    // Warning: possible security issue in not checking the session key
+                    set_field('forum', 'anonymous', !$anonymous_change, 'id', $forum->id);
+                    set_config('anonymous_change',0,$forum->id);
+                    redirect($CFG->wwwroot.'/mod/forum/view.php?id='.$id,'',0);
+                }
+             } else {
+                error("Anonymous varible is not set");
+             }
+            
+            if (!$anonymous && $anonymous_change)
+            {
+                // Don't change to non anonymous UNTIL they confirm the change
+                set_field('forum','anonymous',1,'id',$forum->id);
+                
+                $message = get_string('warningmessage','forum');
+                $linkyes = $CFG->wwwroot.'/mod/forum/view.php?id='.$id; //'&amp;resetanony=1
+                $optionsyes = array('resetanony'=>1,'sesskey'=>sesskey());
+                $linkno = $CFG->wwwroot.'/mod/forum/view.php?id='.$id; //ready changed to yes
+                notice_yesno($message, $linkyes, $linkno, $optionsyes,NULL,'post');
+                
+            
+             }
+        } else {
+            error("Anonymous Change varible is not set");
+        } 
+    } // Anonymous Status Change Warning Code Ends
 
     $forum->intro = trim($forum->intro);
 

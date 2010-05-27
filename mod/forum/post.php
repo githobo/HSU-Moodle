@@ -1,9 +1,10 @@
-<?php // $Id$
+<?php // $Id: post.php,v 1.154.2.12 2008/04/19 10:47:42 skodak Exp $
 
 //  Edit and save a new post to a discussion
 
     require_once('../../config.php');
     require_once('lib.php');
+    require_once('post_form.php');
 
     $reply   = optional_param('reply', 0, PARAM_INT);
     $forum   = optional_param('forum', 0, PARAM_INT);
@@ -138,7 +139,7 @@
             error("Incorrect cm");
         }
 
-        // call course_setup to use forced language, MDL-6926 
+        // call course_setup to use forced language, MDL-6926
         course_setup($course->id);
 
         $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
@@ -382,7 +383,7 @@
             $newdiscussion->usermodified = $post->userid;
             $newdiscussion->timestart    = $discussion->timestart;
             $newdiscussion->timeend      = $discussion->timeend;
-
+            
             if (!$newid = insert_record('forum_discussions', $newdiscussion)) {
                 error('Could not create new discussion');
             }
@@ -442,15 +443,34 @@
     }
     $modcontext = get_context_instance(CONTEXT_MODULE, $cm->id);
 
+
+
+//  if instructor AND forum is anonymous make anony_opt = 1    
+    $anony_opt = 0; // if not instructor and anonymous 
+                    // don't show option this prevents students from setting to reveal
+    $anonymous = get_field('forum','anonymous','id',$forum->id);
+    if (isset($anonymous)) {
+        if ($anonymous and has_capability('moodle/course:manageactivities', $modcontext)) {
+            $anony_opt = 1;
+        }
+    } else {
+        error('Anonymous varible does not exist');
+    }
+
     // setup course variable to force form language
     // fix for MDL-6926
     course_setup($course->id);
     require_once('post_form.php');
 
-    $mform_post = new mod_forum_post_form('post.php', array('course'=>$course, 'cm'=>$cm, 'coursecontext'=>$coursecontext, 'modcontext'=>$modcontext, 'forum'=>$forum, 'post'=>$post));
+    $mform_post = new mod_forum_post_form('post.php', array('course'=>$course, 'cm'=>$cm, 'coursecontext'=>$coursecontext, 'modcontext'=>$modcontext, 'forum'=>$forum, 'post'=>$post,'anony_opt'=>$anony_opt));
 
     if ($fromform = $mform_post->get_data()) {
-
+        
+        if ($anonymous and has_capability('moodle/course:manageactivities', $modcontext)) {
+            if (isset($post->id)) {
+                set_field('forum_posts', 'reveal', $fromform->reveal,'id',$post->id);
+            }       
+        }
 
         require_login($course, false, $cm);
 
@@ -462,7 +482,7 @@
 
         // TODO add attachment processing
         //$fromform->attachment = isset($_FILES['attachment']) ? $_FILES['attachment'] : NULL;
-
+        
         trusttext_after_edit($fromform->message, $modcontext);
 
         if ($fromform->edit) {           // Updating a post
@@ -588,6 +608,7 @@
             }
             $discussion->timestart = $fromform->timestart;
             $discussion->timeend = $fromform->timeend;
+            $discussion->reveal = $fromform->reveal;
 
             $message = '';
             if ($discussion->id = forum_add_discussion($discussion, $message)) {
@@ -742,7 +763,7 @@
 
     } else if (forum_user_has_posted($forum->id, 0, $USER->id)) {
         $subscribe = false;
-        
+
     } else {
         // user not posted yet - use subscription default specified in profile
         $subscribe = !empty($USER->autosubscribe);
@@ -754,6 +775,8 @@
                                         'message'=>$post->message,
                                         'subscribe'=>$subscribe?1:0,
                                         'mailnow'=>!empty($post->mailnow),
+                                        'anony_opt'=>1, // for anonymous posting option
+                                        'show_anony'=>0,
                                         'userid'=>$post->userid,
                                         'parent'=>$post->parent,
                                         'discussion'=>$post->discussion,

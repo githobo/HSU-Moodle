@@ -70,6 +70,7 @@
         fwrite ($bf,full_tag("ID",4,false,$forum->id));
         fwrite ($bf,full_tag("MODTYPE",4,false,"forum"));
         fwrite ($bf,full_tag("TYPE",4,false,$forum->type));
+        fwrite ($bf,full_tag("ANONYMOUS",4,false,$forum->anonymous)); // Added for Anonymous
         fwrite ($bf,full_tag("NAME",4,false,$forum->name));
         fwrite ($bf,full_tag("INTRO",4,false,$forum->intro));
         fwrite ($bf,full_tag("ASSESSED",4,false,$forum->assessed));
@@ -115,6 +116,10 @@
                 $info[$instance->id.'1'][1] = count($ids);
             } else {
                 $info[$instance->id.'1'][1] = 0;
+            }
+            //Discussion Subscriptions (add to forum subscriptions)
+            if ($ids = forum_discussion_subscription_ids_by_instance ($instance->id)) { 
+                $info[$instance->id.'1'][1] += count($ids);
             }
             //Discussions
             $info[$instance->id.'2'][0] = get_string("discussions","forum");
@@ -168,6 +173,33 @@
         }
         return $status;
     }
+    
+    //Backup forum_discussion_subscriptions (execute from forum_backup_discussion)
+    function backup_forum_discussion_subscriptions ($bf, $preferences, $discussion) { 
+        global $CFG;
+
+        $status = true;
+
+        $forum_discussion_subscriptions = get_records("forum_discussion_subscripts", "discussion", $discussion, "id");
+
+        //If there are discussion_subscriptions
+        if ($forum_discussion_subscriptions) { 
+            // Write start tag
+            $status = fwrite ($bf,start_tag("DISCUSSION_SUBSCRIPTIONS", 6, true)); 
+            //Iterate over each subscription
+            foreach ($forum_discussion_subscriptions as $for_dis_sub) { 
+                //Start discussion_subscription
+                $status = fwrite ($bf,start_tag("DISCUSSION_SUBSCRIPTION", 7, true));
+                //Print forum_discussion_subscription contents
+                fwrite ($bf,full_tag("ID", 8, false, $for_dis_sub->id));
+                fwrite ($bf,full_tag("USERID", 8, false, $for_dis_sub->userid));
+                //End discussion_subscription
+                $status = fwrite ($bf,end_tag("DISCUSSION_SUBSCRIPTION", 7, true));
+            }
+            //Write end tag
+            $status = fwrite ($bf,end_tag("DISCUSSION_SUBSCRIPTIONS", 6, true));
+        }
+    }
 
     //Backup forum_discussions contents (executed from forum_backup_mods)
     function backup_forum_discussions ($bf,$preferences,$forum) {
@@ -198,6 +230,8 @@
                 fwrite ($bf,full_tag("TIMEEND",6,false,$for_dis->timeend));
                 //Now print posts to xml
                 $status = backup_forum_posts($bf,$preferences,$for_dis->id);
+                //Now print discussion_subscriptions to xml
+                $status = backup_forum_discussion_subscriptions($bf,$preferences,$for_dis->id);
                 //End discussion
                 $status =fwrite ($bf,end_tag("DISCUSSION",5,true));
             }
@@ -268,6 +302,7 @@
                 fwrite ($bf,full_tag("ATTACHMENT",8,false,$for_pos->attachment));
                 fwrite ($bf,full_tag("TOTALSCORE",8,false,$for_pos->totalscore));
                 fwrite ($bf,full_tag("MAILNOW",8,false,$for_pos->mailnow));
+                fwrite ($bf,full_tag("REVEAL",8,false,$for_pos->reveal));
                 //Now print ratings to xml
                 $status = backup_forum_ratings($bf,$preferences,$for_pos->id);
 
@@ -393,6 +428,10 @@
             } else {
                 $info[1][1] = 0;
             }
+            //Discussion subscriptions (add to total subscriptions)
+            if ($ids = forum_discussion_subscription_ids_by_course ($course)) { 
+                $info[1][1] += count($ids);
+            }
             //Discussions
             $info[2][0] = get_string("discussions","forum");
             if ($ids = forum_discussion_ids_by_course ($course)) {
@@ -463,6 +502,25 @@
         return get_records_sql ("SELECT a.id, a.course
                                  FROM {$CFG->prefix}forum a
                                  WHERE a.course = '$course'");
+    }
+    
+//  Returns an array of forum discussion subscriptiosn ids
+    function forum_discussion_subscription_ids_by_course ($course) { 
+        global $CFG;
+
+        return get_records_sql ("SELECT d.id , d.forum
+                                 FROM  {$CFG->prefix}forum_discussion_subscripts d,
+                                       {$CFG->prefix}forum a
+                                 WHERE a.course = '$course' AND
+                                       d.forum = a.id");
+    }
+    //Returns an array of forum discussion subscription ids
+    function forum_discussion_subscription_ids_by_instance($instanceid) { 
+        global $CFG;
+
+        return get_records_sql ("SELECT d.id , d.forum
+                                 FROM {$CFG->prefix}forum_discussion_subscripts d
+                                 WHERE d.forum = $instanceid");
     }
 
     //Returns an array of forum subscriptions id

@@ -4,6 +4,7 @@
 //  If no post is given, displays all posts in a discussion
 
     require_once('../../config.php');
+    require_once('lib.php');
 
     $d      = required_param('d', PARAM_INT);                // Discussion ID
     $parent = optional_param('parent', 0, PARAM_INT);        // If set, then display this post and all children.
@@ -11,6 +12,7 @@
     $move   = optional_param('move', 0, PARAM_INT);          // If set, moves this discussion to another forum
     $mark   = optional_param('mark', '', PARAM_ALPHA);       // Used for tracking read posts if user initiated.
     $postid = optional_param('postid', 0, PARAM_INT);        // Used for tracking read posts if user initiated.
+    $beenwarned = optional_param('beenwarned', 0, PARAM_INT);// So a anonymous user is warned before moving a discuss topic
 
     if (!$discussion = get_record('forum_discussions', 'id', $d)) {
         error("Discussion ID was incorrect or no longer exists");
@@ -49,6 +51,7 @@
     }
 
 /// move discussion if requested
+    $disp_notice = FALSE; // varible to display the notice in the correct place
     if ($move > 0 and confirm_sesskey()) {
         $return = $CFG->wwwroot.'/mod/forum/discuss.php?d='.$discussion->id;
 
@@ -72,26 +75,33 @@
 
         require_capability('mod/forum:startdiscussion',
             get_context_instance(CONTEXT_MODULE,$cmto->id));
+        
+        // If forum is anonymous Warn before moving
+        $anonymous = get_field('forum','anonymous','id',$fromforum);
+        if ($anonymous and !$beenwarned) { // check if user is moving anonymous to a visiable forum
+            $disp_notice = TRUE;
+        } else {
 
-        if (!forum_move_attachments($discussion, $forumto->id)) {
-            notify("Errors occurred while moving attachment directories - check your file permissions");
+            if (!forum_move_attachments($discussion, $forumto->id)) {
+                notify("Errors occurred while moving attachment directories - check your file permissions");
+            }
+            set_field('forum_discussions', 'forum', $forumto->id, 'id', $discussion->id);
+            set_field('forum_read', 'forumid', $forumto->id, 'discussionid', $discussion->id);
+            add_to_log($course->id, 'forum', 'move discussion', "discuss.php?d=$discussion->id", $discussion->id, $cmto->id);
+    
+            require_once($CFG->libdir.'/rsslib.php');
+            require_once('rsslib.php');
+    
+            // Delete the RSS files for the 2 forums because we want to force
+            // the regeneration of the feeds since the discussions have been
+            // moved.
+            if (!forum_rss_delete_file($forum) || !forum_rss_delete_file($forumto)) {
+                error('Could not purge the cached RSS feeds for the source and/or'.
+                       'destination forum(s) - check your file permissionsforums', $return);
+            }
+    
+            redirect($return.'&amp;moved=-1&amp;sesskey='.sesskey());
         }
-        set_field('forum_discussions', 'forum', $forumto->id, 'id', $discussion->id);
-        set_field('forum_read', 'forumid', $forumto->id, 'discussionid', $discussion->id);
-        add_to_log($course->id, 'forum', 'move discussion', "discuss.php?d=$discussion->id", $discussion->id, $cmto->id);
-
-        require_once($CFG->libdir.'/rsslib.php');
-        require_once('rsslib.php');
-
-        // Delete the RSS files for the 2 forums because we want to force
-        // the regeneration of the feeds since the discussions have been
-        // moved.
-        if (!forum_rss_delete_file($forum) || !forum_rss_delete_file($forumto)) {
-            error('Could not purge the cached RSS feeds for the source and/or'.
-                   'destination forum(s) - check your file permissionsforums', $return);
-        }
-
-        redirect($return.'&amp;moved=-1&amp;sesskey='.sesskey());
     }
 
     $logparameters = "d=$discussion->id";
@@ -212,6 +222,47 @@
         }
     }
     echo "</td></tr></table>";
+    
+/// Print the discussion subscription controls
+    echo '<div class="box clearer"></div>';
+
+    if (!empty($USER->id) && !has_capability('moodle/legacy:guest', $modcontext, NULL, false)) {
+      
+        print_box_start('forumcontrol');
+        print_box_start('subscription');
+        
+        if (has_capability('mod/forum:managesubscriptions', $modcontext)) {
+            $strshoweditdiscsubscribers = get_string('showeditdiscussionsubscribers', 'forum');
+            helpbutton('showeditdiscusssubsc', $strshoweditdiscsubscribers, 'forum');
+            echo "<span class=\"helplink\"><a href=\"discussion_subscribers.php?id=$discussion->id\">$strshoweditdiscsubscribers</a></span><br>";
+        } else if (has_capability('mod/forum:viewsubscribers', $modcontext)) {
+            $strshowdiscsubscribers = get_string('showdiscussionsubscribers', 'forum');
+            helpbutton('showeditdiscusssubsc', $strshowdiscusssubscribers, 'forum'); 
+            echo "<span class=\"helplink\"><a href=\"discussion_subscribers.php?id=$discussion->id\">$strshowdiscusssubscribers</a></span><br>";
+        }
+
+        if (forum_discussion_subscriber($USER->id, $d)) { 
+            $subtext = get_string("unsubscribe_discussion", "forum");    
+            $subtexttitle = get_string("subscribestop_discussion", "forum");
+        } else { 
+            $subtext = get_string("subscribe_discussion", "forum");    
+            $subtexttitle = get_string("subscribestart_discussion", "forum");
+        }
+        echo "<span class=\"helplink\"><a title=\"$subtexttitle\" href=\"discussion_subscribe.php?d=$d\">$subtext</a></span>";
+
+        print_box_end(); // subscription
+        print_box_end(); // forumcontrol
+    }
+
+    echo '<div class="box clearer"></div>';
+
+/// Print Notice of Warning if Moving this Discussion
+    if ($disp_notice) {
+        $message = get_string('anonymouswarning', 'forum');
+        $linkyes = "$CFG->wwwroot/mod/forum/discuss.php?d=$discussion->id&amp;fromforum=$discussion->forum&amp;move=$move&amp;beenwarned=1";
+        $linkno = "$CFG->wwwroot/mod/forum/discuss.php?d=$discussion->id";
+        notice_yesno($message, $linkyes, $linkno);
+    }
 
     if (!empty($forum->blockafter) && !empty($forum->blockperiod)) {
         $a = new object();
@@ -228,10 +279,14 @@
     if ($move == -1 and confirm_sesskey()) {
         notify(get_string('discussionmoved', 'forum', format_string($forum->name,true)));
     }
+    
+    forum_print_topic_nav($d);
 
     $canrate = has_capability('mod/forum:rate', $modcontext);
     forum_print_discussion($course, $cm, $forum, $discussion, $post, $displaymode, $canreply, $canrate);
 
+    forum_print_topic_nav($d);
+    
     print_footer($course);
 
 

@@ -271,6 +271,20 @@ $mod_forum_capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => array(
         )
+    ),
+
+    // Added the viewposters capability
+    'mod/forum:viewposters'=> array(
+    	'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => array(
+            'guest' => CAP_PROHIBIT,
+            'student' => CAP_PREVENT,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'admin' => CAP_ALLOW
+        )
     )
 );
 
