@@ -496,6 +496,15 @@ function forum_cron() {
 
                 $cleanforumname = str_replace('"', "'", strip_tags(format_string($forum->name)));
 
+                // Strip real name to preserve anonymity unless the user wants to be revealed
+                $anonymous = get_field('forum','anonymous','id',$forum->id);
+                $reveal = get_field('forum_posts', 'reveal', 'id', $post->id);
+                if($anonymous && !$reveal) {
+                    $userfrom->firstname = 'Moodle';
+                    $userfrom->lastname = 'Forums';
+                    $userfrom->email = 'do-not-reply@humboldt.edu';
+                }
+
                 $userfrom->customheaders = array (  // Headers to make emails easier to track
                            'Precedence: Bulk',
                            'List-Id: "'.$cleanforumname.'" <moodleforum'.$forum->id.'@'.$hostname.'>',
@@ -515,11 +524,6 @@ function forum_cron() {
                 // Send the post now!
 
                 mtrace('Sending ', '');
-
-                $anonymous = get_field('forum','anonymous','id',$forum->id);
-                if($anonymous) {
-                    $userfrom = "Moodle";
-                }
 
                 if (!$mailresult = email_to_user($userto, $userfrom, $postsubject, $posttext,
                                                  $posthtml, '', '', $CFG->forum_replytouser)) {
