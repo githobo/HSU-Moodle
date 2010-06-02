@@ -154,6 +154,32 @@ function xmldb_forum_upgrade($oldversion=0) {
         $result = $result && add_field($table, $field);
     }
 
+    // anonymous posts in public forum
+    if ($result && $oldversion < 2008080505) {
+
+    /// Define field allowanon to be added to forum
+        $table = new XMLDBTable('forum');
+        $field = new XMLDBField('allowanon');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'blockperiod');
+
+    /// Launch add field allowanon
+        $result = $result && add_field($table, $field);
+    }
+
+
+    // flag to show if post is anonymous or not
+    if ($result && $oldversion < 2008080505) {
+
+    /// Define field anonpost to be added to forum_posts
+        $table = new XMLDBTable('forum_posts');
+        $field = new XMLDBField('anonpost');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'reveal');
+
+    /// Launch add field anonpost
+        $result = $result && add_field($table, $field);
+    }
+
+
 
     return $result;
 }

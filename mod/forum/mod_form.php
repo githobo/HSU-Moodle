@@ -26,12 +26,15 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->addElement('select', 'type', get_string('forumtype', 'forum'), $forum_types);
         $mform->setHelpButton('type', array('forumtype', get_string('forumtype', 'forum'), 'forum'));
         $mform->setDefault('type', 'general');
-        
-        // Chris adds a new option (Anonymous)
-        $mform->addElement('selectyesno', 'anonymous', get_string('enableanonymous','forum') );
+
+        //Anonymous options
+        $mform->addElement('checkbox', 'allowanon', get_string('enableanonymous','forum') );
+        $mform->setHelpButton('allowanon', array('enableanonymous', get_string('enableanonymous', 'forum'), 'forum'));
+        $mform->setDefault('allowanon', "0");
+
+        $mform->addElement('checkbox', 'anonymous', get_string('entireanonymous', 'forum') );
         $mform->setHelpButton('anonymous', array('enableanonymous', get_string('enableanonymous', 'forum'), 'forum'));
-        $mform->setDefault('anonymous', 0);
-        // End
+        $mform->disabledif('anonymous', 'allowanon');
 
         $mform->addElement('htmleditor', 'intro', get_string('forumintro', 'forum'));
         $mform->setType('intro', PARAM_RAW);

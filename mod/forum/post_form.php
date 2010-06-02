@@ -85,6 +85,11 @@ class mod_forum_post_form extends moodleform {
         	}
         }
 
+        // Option to make post anonymous if forum allows it
+        if($forum->allowanon && !$forum->anonymous) {
+            $mform->addElement('checkbox', 'anonpost', get_string('postanonymously', 'forum'));
+        }
+
         if (empty($post->id) && has_capability('moodle/course:manageactivities', $coursecontext)) { // hack alert
             $mform->addElement('checkbox', 'mailnow', get_string('mailnow', 'forum'));
         }

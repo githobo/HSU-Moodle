@@ -499,7 +499,8 @@ function forum_cron() {
                 // Strip real name to preserve anonymity unless the user wants to be revealed
                 $anonymous = get_field('forum','anonymous','id',$forum->id);
                 $reveal = get_field('forum_posts', 'reveal', 'id', $post->id);
-                if($anonymous && !$reveal) {
+                $anonpost = get_field('forum_posts', 'anonpost','id',$post->id);
+                if(($anonymous && !$reveal) || $anonpost) {
                     $userfrom->firstname = 'Moodle';
                     $userfrom->lastname = 'Forums';
                     $userfrom->email = 'do-not-reply@humboldt.edu';
@@ -900,7 +901,8 @@ function forum_make_mail_text($course, $forum, $discussion, $post, $userfrom, $u
         $anonymous = 0;
     }
 
-    if($anonymous){
+    $anonpost = get_field('forum_posts', 'anonpost', 'id', $post->id);
+    if($anonymous OR $anonpost){
         $by->name = get_string('anonymous', 'forum');
     } else {
         $by->name = fullname($userfrom, $viewfullnames);
@@ -3055,8 +3057,12 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
                           // Anonymous Code
     $anonymous = get_field('forum','anonymous','id',$discussion->forum);
     $reveal = get_field('forum_posts', 'reveal','id',$post->id);
+    $anonpost = get_field('forum_posts', 'anonpost','id',$post->id);
     if ($reveal) { // preserve ability to use ternary operators
         $anonymous = 0;
+    }
+    if ($anonpost) {
+        $anonymous = 1;
     }
 
     echo '<tr class="header"><td class="picture left">';
