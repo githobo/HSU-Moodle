@@ -5178,7 +5178,9 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
          and (isguestuser() or !isloggedin() or has_capability('moodle/legacy:guest', $context, NULL, false))) ) {
 
         $currentgroupname = groups_get_group_name(groups_get_activity_group($cm));
-        if (!empty($currentgroupname)) {
+        if (empty($currentgroupname)) {
+            $currentgroupname = get_string('toall','forum') . $currentgroupname;
+        } else {
             $currentgroupname = get_string('to','forum') . $currentgroupname;
         }
 
