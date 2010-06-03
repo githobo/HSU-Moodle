@@ -5177,6 +5177,11 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
         ($forum->type != 'news'
          and (isguestuser() or !isloggedin() or has_capability('moodle/legacy:guest', $context, NULL, false))) ) {
 
+        $currentgroupname = groups_get_group_name(groups_get_activity_group($cm));
+        if (!empty($currentgroupname)) {
+            $currentgroupname = get_string('to','forum') . $currentgroupname;
+        }
+
         echo '<div class="singlebutton forumaddnew">';
         echo "<form id=\"newdiscussionform\" method=\"get\" action=\"$CFG->wwwroot/mod/forum/post.php\">";
         echo '<div>';
@@ -5185,7 +5190,7 @@ function forum_print_latest_discussions($course, $forum, $maxdiscussions=-1, $di
         echo ($forum->type == 'news') ? get_string('addanewtopic', 'forum')
             : (($forum->type == 'qanda')
                ? get_string('addanewquestion','forum')
-               : get_string('addanewdiscussion', 'forum'));
+               : get_string('addanewdiscussion', 'forum') . $currentgroupname);
         echo '" />';
         echo '</div>';
         echo '</form>';
