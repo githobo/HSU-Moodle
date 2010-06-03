@@ -11,6 +11,9 @@
         { $config->user_type = 'default'; }
     if (!isset($config->user_attribute))
         { $config->user_attribute = ''; }
+    // HSU mod for User Filter
+    if (!isset ($config->user_filter))
+        { $config->user_filter = ''; }
     if (!isset($config->search_sub))
         { $config->search_sub = ''; }
     if (!isset($config->opt_deref))
@@ -218,6 +221,17 @@ if (!function_exists('ldap_connect')) { // Is php4-ldap really there?
     </td>
     <td>
     <?php print_string('auth_ldap_user_attribute','auth') ?>
+    </td>
+</tr>
+<!-- HSU mod for User Filter -->
+<tr valign="top" class="optional">
+    <td align="right"><label for="user_filter"><?php print_string('auth_ldap_user_filter', 'auth') ?></label></td>
+    <td>
+        <input name="user_filter" id="user_attribute" type="text" size="30" value="<?php echo $config->user_filter?>" />
+        <?php if (isset($err['user_filter'])) formerr($err['user_filter']); ?>
+    </td>
+    <td>
+        <?php print_string("auth_ldap_user_filter", "auth"); ?>
     </td>
 </tr>
 

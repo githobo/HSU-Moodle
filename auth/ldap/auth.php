@@ -273,7 +273,13 @@ class auth_plugin_ldap extends auth_plugin_base {
      * @return array
      */
     function get_userlist() {
+    	// HSU mod for User Filter
+        if (!empty($this->config->user_filter)) {
+            return $this->ldap_get_userlist('(&('.$this->config->user_attribute.'=*)'.$this->config->user_filter.')');
+        }
+        else {
         return $this->ldap_get_userlist("({$this->config->user_attribute}=*)");
+    }
     }
 
     /**
@@ -287,7 +293,13 @@ class auth_plugin_ldap extends auth_plugin_base {
         $extusername = $textlib->convert(stripslashes($username), 'utf-8', $this->config->ldapencoding);
 
         //returns true if given username exist on ldap
+        // HSU mod for User Filter
+        if (!empty($this->config->user_filter)) {
+            return $this->ldap_get_userlist('(&('.$this->config->user_attribute.'='.$this->filter_addslashes($extusername).')'.$this->config->user_filter.')');
+        }
+        else {
         $users = $this->ldap_get_userlist("({$this->config->user_attribute}=".$this->filter_addslashes($extusername).")");
+        }
         return count($users);
     }
 
@@ -605,7 +617,13 @@ class auth_plugin_ldap extends auth_plugin_base {
         //// get user's list from ldap to sql in a scalable fashion
         ////
         // prepare some data we'll need
-        $filter = '(&('.$this->config->user_attribute.'=*)'.$this->config->objectclass.')';
+        // HSU mod for User Filter
+        if (!empty($this->config->user_filter)) {
+            $filter = "(&(".$this->config->user_attribute."=*)(".$this->config->objectclass.")".$this->config->user_filter.")";
+        }
+        else {
+            $filter = "(&(".$this->config->user_attribute."=*)(".$this->config->objectclass."))";
+        }
 
         $contexts = explode(";",$this->config->contexts);
 
@@ -1732,7 +1750,13 @@ class auth_plugin_ldap extends auth_plugin_base {
         $ldapconnection = $this->ldap_connect();
 
         if ($filter=="*") {
-           $filter = '(&('.$this->config->user_attribute.'=*)'.$this->config->objectclass.')';
+            // HSU mod for User Filter
+            if (!empty($this->config->user_filter)) {
+                $filter = "(&(".$this->config->user_attribute."=*)(".$this->config->objectclass.")".$this->config_user_filter.")";
+        }
+            else {
+                $filter = "(&(".$this->config->user_attribute."=*)(".$this->config->objectclass."))";
+            }
         }
 
         $contexts = explode(";",$this->config->contexts);
@@ -2037,6 +2061,8 @@ class auth_plugin_ldap extends auth_plugin_base {
             { $config->user_type = 'default'; }
         if (!isset($config->user_attribute))
             { $config->user_attribute = ''; }
+        if (!isset ($config->user_filter)) // HSU mod for User Filter
+            { $config->user_filter = ''; }
         if (!isset($config->search_sub))
             { $config->search_sub = ''; }
         if (!isset($config->opt_deref))
@@ -2095,6 +2121,7 @@ class auth_plugin_ldap extends auth_plugin_base {
         set_config('contexts', $config->contexts, 'auth/ldap');
         set_config('user_type', $config->user_type, 'auth/ldap');
         set_config('user_attribute', $config->user_attribute, 'auth/ldap');
+        set_config('user_filter', $config->user_filter, 'auth/ldap'); // HSU mod for User Filter
         set_config('search_sub', $config->search_sub, 'auth/ldap');
         set_config('opt_deref', $config->opt_deref, 'auth/ldap');
         set_config('preventpassindb', $config->preventpassindb, 'auth/ldap');
