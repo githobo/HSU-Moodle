@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-us" />
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>Title of Page</title>
+<!-- TemplateEndEditable -->
+<link rel='stylesheet' type='text/css' media='all' href='../styles/main.css' />
+<style type='text/css' media='screen'>
+@import url(../styles/main.css);
+</style>
+<script type="text/javascript" src="../scripts/main.js"></script>
+<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable --><!-- TemplateParam name="id" type="text" value="pg-id" -->
+</head>
+
+<body class="interior" id="@@(id)@@">
+
+<div id="container">
+
+<div id="branding">
+<p id="wordmark"><a href="http://www.humboldt.edu"><img src="../images/wordmark.gif" alt="Humboldt State University" /></a></p>
+</div>
+
+<div class="skipper"><a href="#nav-secondary">Skip to secondary navigation</a></div><div class="skipper"><a href="#text">Skip to content</a></div>
+
+<div id="nav-main">
+    
+    	<!-- TemplateBeginEditable name="nav-main" --><!-- #BeginLibraryItem "/Library/main-navigation.lbi" -->
+    	<ul>
+		<li id="home"><a href="../index.html">Home</a></li>
+    	<li><a href="../interior2col.html">Interior 2 Column Page </a></li>
+    	<li><a href="../interior3col.html">Interior 3 Column Page </a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Contact Us</a></li>
+		</ul><!-- #EndLibraryItem --><!-- TemplateEndEditable -->
+    	
+</div>
+
+<div id="content">
+
+<p><!-- #BeginLibraryItem "/Library/dept-title.lbi" --><img src="../images/title.gif" alt="Department Name" /><!-- #EndLibraryItem --></p>
+<!-- TemplateBeginEditable name="page title" -->
+<h1>Heading 1 (Title of Page)</h1>
+<!-- TemplateEndEditable -->
+<div id="nav-secondary">
+    <ul>
+    	<!-- TemplateBeginEditable name="nav-secondary" -->
+    	<li><a href="#">Secondary nav link</a></li>
+    	<li><a href="#">Secondary nav link</a></li>
+    	<li><a href="#">Secondary nav link</a></li>
+    	<li><a href="#">Secondary nav link</a></li>
+    	<li><a href="#">Secondary nav link</a></li>
+    	<li><a href="#">Secondary nav link</a></li>
+    	<!-- TemplateEndEditable -->
+    	</ul>
+</div>
+
+<div id="text"> <!-- TemplateBeginEditable name="content" -->
+	<h2>Heading 2</h2>
+	<h3>Heading 3</h3>
+	<h4>Heading 4</h4>
+	<p>Lorem ipsum dolor sit amet, <strong>strong text</strong> consectetuer <em>emphasized
+			text</em> adipiscing <a href="#">and a link</a> elit. Sed sit amet leo et
+			velit egestas eleifend. Proin nec nunc quis mi fermentum bibendum. Nulla nulla
+			metus, viverra in, gravida elementum, interdum ac, dui. Cras id ipsum eget
+			eros dapibus vestibulum.</p>
+	<ul class="jumpto">
+		<li><a href="#">Jump to</a></li>
+		<li><a href="#">anchor</a></li>
+		<li><a href="#">link</a></li>
+	</ul>
+	<p>Above we have an example of navigation to jump to another section on the
+		page. Below we have an example of an illustrated definition list. You will
+		need to check the source code or the documentation to see how to set them up.</p>
+	<dl class="illustrated">
+		<dt><a href="http://macromedia.com/software/dreamweaver/?promoid=BINR">Dreamweaver
+				8</a></dt>
+		<dd class="thumbnail"><img src="../images/sample.gif" width="50" alt="sample image" /></dd>
+		<dd>This is an example of an illustrated definition list. The thumbnail image
+			should be 50 pixels wide. Check the source code to see how to set it up.</dd>
+	</dl>
+	<p>Images can also be set up to have captions, as is demonstrated in the example
+		below. There are more example of styles for images on the interior 2-column
+		page.</p>
+	<div class="caption"><img src="../images/wordmarkguide.gif" alt="diagram of wordmark and bar showing pixel dimensions" width="376" height="101" />
+    		<p>Figure 1. Example of a captioned image. Check source to see how to set
+    			up. The maximum width for an image is 375 pixels.</p>
+	</div>
+	
+	<table id="azindex" cellspacing="0">
+	<caption>Names, locations, phone numbers and fax numbers for HSU departments beginning with the letter V.</caption>
+	<thead>
+		<tr>
+			<th scope="col">Department Name</th>
+			<th scope="col">Location</th>
+			<th scope="col">Phone (707) </th>
+			<th scope="col">Fax (707)</th>
+		</tr>
+	</thead>
+	<tbody>
+<tr>
+<td colspan="4">
+Van Duzer Theatre: see Theatre, Film & Dance</td>
+</tr>		<tr>
+			<td>Vehicle Scheduling</td>
+			<td>Plant Operations 100</td>
+			<td>826-3646</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>Vending</td>
+			<td>&nbsp;</td>
+			<td>826-3541</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>Vessel Operations: Coral Sea</td>
+			<td>Woodley Island Marina, Eureka</td>
+			<td>499-5090</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>Veterans Enrollment Services</td>
+			<td>Student & Business Services 133</td>
+			<td>826-6191</td>
+			<td>826-6186</td>
+		</tr>
+		<tr>
+			<td>Veterans Upward Bound</td>
+			<td>Univ. Annex 158</td>
+			<td>826-4971</td>
+			<td>826-5237</td>
+		</tr>
+		<tr>
+			<td>Vetrebrate Museum</td>
+			<td>Science C 103</td>
+			<td>826-4872</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>Virtual Tour of HSU</td>
+			<td>&nbsp;</td>
+			<td>1-866-850-9556</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>Visitor's Center</td>
+			<td>Student & Business Services Lobby</td>
+			<td>826-4402 or toll free: (866) 850-9556</td>
+			<td>826-6194</td>
+		</tr>
+
+	</tbody>
+	</table>
+
+	<!-- TemplateEndEditable -->
+	<div class="clearer"></div>
+</div></div>
+<div class="clearer"></div>
+</div><!-- /container -->
+
+<div id="contact"><!-- #BeginLibraryItem "/Library/footer.lbi" --><p>Office Location • 1 Harpst St., Arcata, CA 95521 • 707.826.xxxx • <a href="#">Contact Us</a>.</p><!-- #EndLibraryItem --></div>
+ 
+</body>
+</html>

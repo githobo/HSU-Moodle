@@ -1,0 +1,6 @@
+Template A changelog
+
+31 Jan 06:	Initial Release
+1 Feb 06:	Updated Terms of Use
+14 Feb 06:	Added .thumb class to main.css
+20 Apr 07:  Fixed error with @import rule in index.dwt

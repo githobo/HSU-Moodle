@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-us" />
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>Title of Page</title>
+<!-- TemplateEndEditable -->
+<link rel='stylesheet' type='text/css' media='all' href='../styles/main.css' />
+<style type='text/css' media='screen'>
+@import url(../styles/main.css);
+</style>
+<script type="text/javascript" src="../scripts/main.js"></script>
+<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable --><!-- TemplateParam name="id" type="text" value="pg-id" -->
+</head>
+
+<body class="interior col2" id="@@(id)@@">
+
+<div id="container">
+
+<div id="branding">
+<p id="wordmark"><a href="http://www.humboldt.edu"><img src="../images/wordmark.gif" alt="Humboldt State University" /></a></p>
+</div>
+
+<div class="skipper"><a href="#nav-secondary">Skip to secondary navigation</a></div><div class="skipper"><a href="#text">Skip to content</a></div>
+
+<div id="nav-main">
+    
+    	<!-- TemplateBeginEditable name="nav-main" --><!-- #BeginLibraryItem "/Library/main-navigation.lbi" -->
+    	<ul>
+		<li id="home"><a href="../index.html">Home</a></li>
+    	<li><a href="../interior2col.html">Interior 2 Column Page </a></li>
+    	<li><a href="../interior3col.html">Interior 3 Column Page </a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Contact Us</a></li>
+		</ul><!-- #EndLibraryItem --><!-- TemplateEndEditable -->
+    	
+</div>
+
+<div id="content">
+
+<p><!-- #BeginLibraryItem "/Library/dept-title.lbi" --><img src="../images/title.gif" alt="Department Name" /><!-- #EndLibraryItem --></p>
+<!-- TemplateBeginEditable name="content" -->
+<h1>Heading 1 (Title of Page)</h1>
+<h2>Heading 2</h2>
+<h3>Heading 3</h3>
+<h4>Heading 4</h4>
+<p>Lorem ipsum dolor sit amet, <strong>strong text</strong> consectetuer <em>emphasized
+		text</em> adipiscing <a href="#">and a link</a> elit. Sed sit amet leo et velit
+		egestas eleifend. Proin nec nunc quis mi fermentum bibendum. Nulla nulla metus,
+		viverra in, gravida elementum, interdum ac, dui. Cras id ipsum eget eros dapibus
+		vestibulum.</p>
+<p>Images can also be set up to float to the left or the right of paragraphs,
+	as shown in the examples below. Borders can also be added to the image as in
+	the second example below. See documentation to learn how to set this up. There
+	are more image examples in the interior 3-column template.</p>
+<p><img src="../images/sample.gif" class="right" />The image is floated to the
+	right of this paragraph. Lorem ipsum dolor sit amet, <strong>strong text</strong> consectetuer <em>emphasized
+	text</em> adipiscing <a href="#">and a link</a> elit. Sed sit amet leo et velit
+	egestas eleifend. Proin nec nunc quis mi fermentum bibendum. Nulla nulla metus,
+	viverra in, gravida elementum, interdum ac, dui. Cras id ipsum eget eros dapibus
+	vestibulum.</p>
+<p><img src="../images/sample.gif" class="left thumb" />The image is floated
+	to the left of this paragraph. Lorem ipsum dolor sit amet, <strong>strong text</strong> consectetuer <em>emphasized
+	text</em> adipiscing <a href="#">and a link</a> elit. Sed sit amet leo et velit
+	egestas eleifend. Proin nec nunc quis mi fermentum bibendum. Nulla nulla metus,
+	viverra in, gravida elementum, interdum ac, dui. Cras id ipsum eget eros dapibus
+	vestibulum.</p>
+		<form method="post" action="#" >
+<h2>A Simple Form</h2>
+<p>To test the form styles. </p>
+
+<input type="hidden" id="subject" name="subject" size="40" value="Web Site Feedback" />
+
+<p><label for="name">Your Name:</label><br />
+<input type="text" name="name" size="40" /></p>
+
+<p><label for="from">Your Email (required):</label><br />
+<input type="text" id="from" name="from" size="40" maxlength="35" value="" /></p>
+
+<p><label for="message">Comments (required): </label><br />
+<textarea id="message" name="message" rows="18" cols="40"> </textarea></p>
+
+<p><input name="submit" type='submit' value='Submit' /></p>
+
+</form>
+<!-- TemplateEndEditable -->
+<div class="clearer"></div>
+</div>
+<div class="clearer"></div>
+</div><!-- /container -->
+
+<div id="contact"><!-- #BeginLibraryItem "/Library/footer.lbi" --><p>Office Location • 1 Harpst St., Arcata, CA 95521 • 707.826.xxxx • <a href="#">Contact Us</a>.</p><!-- #EndLibraryItem --></div>
+ 
+</body>
+</html>

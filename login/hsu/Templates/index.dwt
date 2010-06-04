@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-us" />
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>Login: HSU Moodle</title>
+<!-- TemplateEndEditable -->
+<link rel='stylesheet' type='text/css' media='all' href='../styles/main.css' />
+<style type='text/css' media='screen'>
+@import "styles/main.css";
+</style>
+<script type="text/javascript" src="../scripts/main.js"></script>
+<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable --><!-- TemplateParam name="id" type="text" value="main" -->
+</head>
+
+<body id="main">
+
+<div id="container">
+
+<div id="branding">
+<p id="wordmark"><a href="http://www.humboldt.edu"><img src="../images/wordmark.gif" alt="Humboldt State University" /></a></p>
+</div>
+
+<div class="skipper"><a href="#nav-secondary">Skip to secondary navigation</a></div><div class="skipper"><a href="#text">Skip to content</a></div>
+
+<div id="nav-main">
+   <!-- TemplateBeginEditable name="nav-main" --><!-- #BeginLibraryItem "/Library/main-navigation.lbi" -->
+    	<ul>
+		<li id="home"><a href="../index.html">Home</a></li>
+    	<li><a href="../interior2col.html">Interior 2 Column Page </a></li>
+    	<li><a href="../interior3col.html">Interior 3 Column Page </a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Main Navigation Link</a></li>
+    	<li><a href="#">Contact Us</a></li>
+		</ul><!-- #EndLibraryItem --><!-- TemplateEndEditable -->
+	</div>
+
+<div id="content">
+
+<h1><!-- #BeginLibraryItem "/Library/dept-title.lbi" --><img src="../images/moodletitle.gif" alt="Department Name" /><!-- #EndLibraryItem --></h1>
+
+<!-- TemplateBeginEditable name="content" -->
+<h2>Heading 2</h2>
+<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+	Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+	when an unknown printer took a galley of type and scrambled it to make a type
+	specimen book. It has survived not only five centuries, but also the leap into
+	electronic typesetting, remaining essentially unchanged.</p>
+<h3>Heading 3</h3>
+<p>It is a long established fact that a reader will be distracted by the readable
+	content of a page when looking at its layout. The point of using Lorem Ipsum
+	is that it has a more-or-less normal distribution of letters, as opposed to
+	using 'Content here, content here', making it look like readable English.</p>
+<h4>Heading 4</h4>
+<p>Lorem ipsum dolor sit amet, <strong>strong text</strong> consectetuer <em>emphasized
+		text</em> adipiscing <a href="#">and a link</a> elit. Sed sit amet leo et velit
+		egestas eleifend. Proin nec nunc quis mi fermentum bibendum. Nulla nulla metus,
+		viverra in, gravida elementum, interdum ac, dui. Cras id ipsum eget eros dapibus
+		vestibulum. Aliquam ultricies. In lacinia rutrum leo. Pellentesque habitant
+		morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris
+		iaculis tempor nunc.</p>
+<ul>
+	<li>Unordered lists</li>
+	<li>are good for listing things</li>
+	<li>that are in no particular order</li>
+	<li>and will be displayed with bullets</li>
+</ul>
+<ol>
+	<li>Ordered lists</li>
+	<li>are good for listing things</li>
+	<li>that that have a definite sequence</li>
+	<li>and will be displayed with numbers</li>
+</ol>
+<dl>
+	<dt>Definition Lists</dt>
+	<dd>are very versatile and underused.</dd>
+	<dt>They can be used</dt>
+	<dd>for terms and descriptions</dd>
+</dl>
+<!-- TemplateEndEditable --></div>
+<div class="clearer"></div>
+</div><!-- /container -->
+
+<div id="contact"><!-- #BeginLibraryItem "/Library/footer.lbi" --><p>Library 315 • 1 Harpst St., Arcata, CA 95521 • 707.826.3633 • <a href="mailto:mdlsos@humboldt.edu">Contact Us</a>.</p><!-- #EndLibraryItem --></div>
+ 
+</body>
+</html>
