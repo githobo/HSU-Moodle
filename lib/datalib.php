@@ -474,7 +474,7 @@ function get_courses($categoryid="all", $sort="c.sortorder ASC", $fields="c.*") 
  *
  */
 function get_courses_page($categoryid="all", $sort="c.sortorder ASC", $fields="c.*",
-                          &$totalcount, $limitfrom="", $limitnum="") {
+                          &$totalcount, $limitfrom="", $limitnum="", $letter="") {  // HSU mod to browse courses alphabetically
 
     global $USER, $CFG;
 
@@ -483,6 +483,11 @@ function get_courses_page($categoryid="all", $sort="c.sortorder ASC", $fields="c
         $categoryselect = "WHERE c.category = '$categoryid'";
     } else {
         $categoryselect = "";
+    }
+
+    // HSU mod to browse courses alphabetically
+	if(ord($letter) > 64 && ord($letter) < 92) {
+    	$categoryselect = "WHERE c.category = '$categoryid' AND c.fullname LIKE '$letter%'";
     }
 
     // pull out all course matching the cat
@@ -494,7 +499,7 @@ function get_courses_page($categoryid="all", $sort="c.sortorder ASC", $fields="c
                                    JOIN {$CFG->prefix}context ctx
                                      ON (c.id = ctx.instanceid AND ctx.contextlevel=".CONTEXT_COURSE.")
                                    $categoryselect
-                                   ORDER BY $sort"))) {
+                                   ORDER BY fullname"))) { // HSU mod so display will be alphabetical
         return $visiblecourses;
     }
     $totalcount = 0;
@@ -1123,7 +1128,10 @@ function get_courses_search($searchterms, $sort='fullname ASC', $page=0, $record
             $shortnamesearch .= ' AND ';
         }
 
-        if (substr($searchterm,0,1) == '+') {
+    //HSU mod to search by CRN
+	if ( count($searchterms) == 1 && is_numeric($searchterm) ) {
+		$crnnumber = " SUBSTR(idnumber, -5, 5) $LIKE $searchterm ";
+	} else if (substr($searchterm,0,1) == '+') {
             $searchterm      = substr($searchterm,1);
             $summarysearch  .= " c.summary $REGEXP '(^|[^a-zA-Z0-9])$searchterm([^a-zA-Z0-9]|$)' ";
             $fullnamesearch .= " c.fullname $REGEXP '(^|[^a-zA-Z0-9])$searchterm([^a-zA-Z0-9]|$)' ";
@@ -1150,10 +1158,16 @@ function get_courses_search($searchterms, $sort='fullname ASC', $page=0, $record
             FROM {$CFG->prefix}course c
             JOIN {$CFG->prefix}context ctx
              ON (c.id = ctx.instanceid AND ctx.contextlevel=".CONTEXT_COURSE.")
-            WHERE (( $fullnamesearch ) OR ( $summarysearch ) OR ( $idnumbersearch ) OR ( $shortnamesearch ))
-                  AND category > 0
+            WHERE";
+    //HSU mod to search by CRN
+    if(!empty($crnnumber)) {
+    	$sql .= " $crnnumber ";
+    } else {
+    	$sql .= " (( $fullnamesearch ) OR ( $summarysearch ) OR ( $idnumbersearch ) OR ( $shortnamesearch )) ";
+    }
+    $sql .= "AND category > 0
             ORDER BY " . $sort;
-
+    
     $courses = array();
 
     if ($rs = get_recordset_sql($sql)) {

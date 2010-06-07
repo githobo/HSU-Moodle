@@ -16,6 +16,7 @@
     $movedown = optional_param('movedown', 0, PARAM_INT);
     $moveto = optional_param('moveto', 0, PARAM_INT);
     $resort = optional_param('resort', 0, PARAM_BOOL);
+    $letter = optional_param('letter', 0, PARAM_TEXT);  // HSU mod for browsing courses alphabetically
 
     if ($CFG->forcelogin) {
         require_login();
@@ -253,23 +254,63 @@
 
 
 /// Print out all the courses
-    $courses = get_courses_page($category->id, 'c.sortorder ASC',
+// HSU mod for browsing courses alphabetically
+    if(ord($letter) > 64 && ord($letter) < 92) {  // Only uppercase letters will be passed
+	    $courses = get_courses_page($category->id, 'c.fullname ASC',
+            'c.id,c.sortorder,c.shortname,c.fullname,c.summary,c.visible,c.teacher,c.guest,c.password',
+	                                $totalcount, $page*$perpage, $perpage, $letter);
+	} else {
+		$courses = get_courses_page($category->id, 'c.fullname ASC',
             'c.id,c.sortorder,c.shortname,c.fullname,c.summary,c.visible,c.teacher,c.guest,c.password',
             $totalcount, $page*$perpage, $perpage);
+	}
     $numcourses = count($courses);
 
     if (!$courses) {
-        if (empty($subcategorieswereshown)) {
+        if (empty($subcategorieswereshown) and !($letter)) {
             print_heading(get_string("nocoursesyet"));
         }
+        if($letter) {
+	        $output = '<div class="paging">';
+	        $output .= 'There are no classes that begin with '.$letter.'.<br><br>';
+	        $output .= '&nbsp;<a href="'.$CFG->wwwroot.'/course/category.php?id='.$id.'">All</a>&nbsp;';
+	        for($i = 65; $i < 91; $i++) {
+	        	if($i == ord($letter)) {
+	        		$output .= '&nbsp;'.chr($i).'&nbsp;';
+	        	}else {
+	        		$output .= '&nbsp;<a href="'.$CFG->wwwroot.'/course/category.php?id='.$id.'&letter='.chr($i).'">'.chr($i).'</a>&nbsp;';
+	        	}
+	        }
+	        $output .= '</div><br />';
+	        echo $output;
+        }
 
-    } else if ($numcourses <= COURSE_MAX_SUMMARIES_PER_PAGE and !$page and !$editingon) {
+    } else if ($numcourses <= COURSE_MAX_SUMMARIES_PER_PAGE and !$page and !$editingon and !$letter) {
+
         print_box_start('courseboxes');
         print_courses($category);
         print_box_end();
 
     } else {
-        print_paging_bar($totalcount, $page, $perpage, "category.php?id=$category->id&amp;perpage=$perpage&amp;");
+
+        print_paging_bar($totalcount, $page, $perpage, "category.php?id=$category->id&amp;perpage=$perpage&amp;",empty($letter) ? "page" : "letter=$letter&page");
+        $output = '<div class="paging">';
+        if(!empty($letter)) {
+        	$output .= '&nbsp;<a href="'.$CFG->wwwroot.'/course/category.php?id='.$id.'">All</a>&nbsp;';
+        } else {
+        	$output .= '&nbsp;All&nbsp;';
+        }
+        for($i = 65; $i < 91; $i++) {
+        	if($i == ord($letter)) {
+        		$output .= '&nbsp;'.chr($i).'&nbsp;';
+        	}else {
+        		$output .= '&nbsp;<a href="'.$CFG->wwwroot.'/course/category.php?id='.$id.'&letter='.chr($i).'">'.chr($i).'</a>&nbsp;';
+        	}
+        }
+        $output .= '</div>';
+        echo $output;
+
+        // end HSU mod
 
         $strcourses = get_string('courses');
         $strselect = get_string('select');

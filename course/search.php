@@ -315,12 +315,18 @@
         print_navigation_bar($totalcount,$page,$perpage,$encodedsearch,$modulelink);
 
     } else {
+        // HSU mod for CRN search
         if (!empty($search)) {
-            print_heading(get_string("nocoursesfound", "", s($search, true)));
+        	if( is_numeric($search) ) {
+        		print_heading(get_string("nocrnfound", "", s($search, true)));
+        	} else {
+                print_heading(get_string("nocoursesfound", "", s($search, true)));
+            }
         }
         else {
             print_heading( $strnovalidcourses );
         }
+    // end HSU mod
     }
 
     echo "<br /><br />";
