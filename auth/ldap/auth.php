@@ -619,12 +619,12 @@ class auth_plugin_ldap extends auth_plugin_base {
         // prepare some data we'll need
         // HSU mod for User Filter
         if (!empty($this->config->user_filter)) {
-            $filter = "(&(".$this->config->user_attribute."=*)(".$this->config->objectclass.")".$this->config->user_filter.")";
+            $filter = "(&". $this->config->user_filter . "(" . $this->config->user_attribute."=*)" . $this->config->objectclass . ")";
         }
         else {
             $filter = "(&(".$this->config->user_attribute."=*)(".$this->config->objectclass."))";
         }
-
+                
         $contexts = explode(";",$this->config->contexts);
 
         if (!empty($this->config->create_context)) {
