@@ -560,6 +560,8 @@ function create_course ($course_ext,$skip_fix_course_sortorder=0){
     // override defaults with template course
     if(!empty($CFG->enrol_ldap_template)){
         $course = get_record("course", 'shortname', $CFG->enrol_ldap_template);
+        //HSU hack to get the sections for the template course to be created.
+        $sections = get_records('course_sections','course',$course->id);
         unset($course->id); // so we are clear to reinsert the record
         unset($course->sortorder);
     } else {
