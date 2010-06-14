@@ -608,13 +608,22 @@ function create_course ($course_ext,$skip_fix_course_sortorder=0){
     $course->visible     = 1;
     
     $course = addslashes_recursive($course);
-
+    
     // store it and log
     if ($newcourseid = insert_record("course", $course)) {  // Set up new course
-        $section = new object();
-        $section->course = $newcourseid;   // Create a default section.
-        $section->section = 0;
-        $section->id = insert_record("course_sections", $section);
+        // HSU hack to get the sections for the template course to be created.
+        if(!empty($sections)) {
+            foreach($sections as $key => $section) {
+                $section->course = $newcourseid;
+                unset($section->id);
+                $section->id = insert_record("course_sections", $section);
+            }
+        } else {  // create a default section
+            $section = new object();
+            $section->course = $newcourseid;   // Create a default section.
+            $section->section = 0;
+            $section->id = insert_record("course_sections", $section);
+        }  //end HSU hack
         $page = page_create_object(PAGE_COURSE_VIEW, $newcourseid);
         blocks_repopulate_page($page); // Return value no
 
