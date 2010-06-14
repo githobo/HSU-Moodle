@@ -203,9 +203,8 @@ $string['auth_ldap_server_settings'] = 'LDAP server settings';
 $string['auth_ldap_update_userinfo'] = 'Update user information (firstname, lastname, address..) from LDAP to Moodle.  Specify \"Data mapping\" settings as you need.';
 $string['auth_ldap_user_exists'] = 'LDAP username already exists.';
 $string['auth_ldap_user_attribute'] = 'Optional: Overrides the attribute used to name/search users. Usually \'cn\'.';
-//HSU mod for user filter
-$string['auth_ldap_user_filter'] = "LDAP User Filter";
-$string['auth_ldap_user_filter_desc'] = "Optional: LDAP filter to limit users pulled into Moodle database.";
+$string['auth_ldap_user_filter'] = "LDAP User Filter";  //HSU mod for user filter
+$string['auth_ldap_user_filter_desc'] = "Optional: LDAP filter to limit users pulled into Moodle database. WARNING: If the filter is invalid LDAP syntax user syncing through LDAP will fail."; //HSU mod for user filter
 $string['auth_ldap_user_settings'] = 'User lookup settings';
 $string['auth_ldap_user_type'] = 'Select how users are stored in LDAP. This setting also specifies how login expiration, grace logins and user creation will work.';
 $string['auth_ldap_version'] = 'The version of the LDAP protocol your server is using.';
