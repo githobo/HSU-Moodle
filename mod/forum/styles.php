@@ -128,6 +128,7 @@ due to the fact that the YUI builds each expandable row as its own table.*/
   margin-left: 30px;
   float: left;
   clear: both;
+  width: 100%         /* one per line, clear doesn't work */
 }
 
 #treeDiv2 .subscribed {
