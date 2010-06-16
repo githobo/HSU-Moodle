@@ -135,6 +135,7 @@ $string['forumview'] = 'Forum view';
 $string['forum:viewanyrating'] = 'View any ratings';
 $string['forum:viewdiscussion'] = 'View discussions';
 $string['forum:viewhiddentimedposts'] = 'View hidden timed posts';
+$string['forum:viewposters'] = 'View participants';
 $string['forum:viewqandawithoutposting'] = 'Always see Q and A posts';
 $string['forum:viewrating'] = 'View ratings';
 $string['forum:viewsubscribers'] = 'View subscribers';
