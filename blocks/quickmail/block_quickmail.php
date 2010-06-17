@@ -42,8 +42,9 @@ class block_quickmail extends block_list {
     /**
      * Limits where the block can be added.
      **/
+    //HSU mod to allow display on the front page
     function applicable_formats() {
-        return array('site' => false, 'my' => false, 'course' => true);
+        return array('site' => true, 'my' => true, 'course' => true);
     }
 
     /**
