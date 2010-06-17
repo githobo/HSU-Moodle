@@ -111,7 +111,7 @@ if ($chapter) {
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
     <html>
     <head>
-      <title><?PHP echo format_string(name) ?></title>
+      <title><?PHP echo format_string($book->name) ?></title>
       <meta http-equiv="Content-Type" content="text/html; charset=<?PHP echo $encoding ?>" />
       <meta name="description" content="<?PHP echo s(format_string($book->name)) ?>" />
       <link rel="stylesheet" type="text/css" href="book_print.css" />
