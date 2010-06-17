@@ -32,7 +32,7 @@
 				   <a href=\"view.php?f=$f\">".format_string($forum->name,true)."</a> -> $viewposters_str";
 
     print_header_simple(format_string($forum->name), "",
-                 "$navigation ", "", "", true, $buttontext, navmenu($course, $cm));
+                 "$navigation ", "", "", true, "", navmenu($course, $cm));
     
     require_capability('mod/forum:viewposters',$context);
 
