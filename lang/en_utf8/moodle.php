@@ -1085,6 +1085,7 @@ $string['nobody'] = 'Nobody';
 $string['nochange'] = 'No change';
 $string['nocoursesfound'] = 'No courses were found with the words \'$a\'';
 $string['nocoursesyet'] = 'No courses in this category';
+$string['nocrnfound'] = 'No courses were found with the CRN \'$a\''; // HSU addition for CRN search
 $string['nodstpresets'] = 'The administrator has not enabled Daylight Savings Time support.';
 $string['noexistingadmins'] = 'No existing admins, this is a serious error and you should never have seen this message.';
 $string['noexistingcreators'] = 'No existing creators';
