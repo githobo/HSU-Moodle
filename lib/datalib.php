@@ -1163,10 +1163,24 @@ function get_courses_search($searchterms, $sort='fullname ASC', $page=0, $record
     if(!empty($crnnumber)) {
     	$sql .= " $crnnumber ";
     } else {
-    	$sql .= " (( $fullnamesearch ) OR ( $summarysearch ) OR ( $idnumbersearch ) OR ( $shortnamesearch )) ";
+    	// HSU hack to make search results more relevant
+        $sql .= " $shortnamesearch ";
     }
-    $sql .= "AND category > 0
-            ORDER BY " . $sort;
+    $sql .= "AND category > 0 ";
+    if (!empty($crnnumber)) {
+        $sql .=     " ORDER BY category DESC"; 
+    } else {
+        $sql .= " UNION ALL ";
+        $sql .= "SELECT c.*,
+                   ctx.id AS ctxid, ctx.path AS ctxpath,
+                   ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
+            FROM {$CFG->prefix}course c
+            JOIN {$CFG->prefix}context ctx
+             ON (c.id = ctx.instanceid AND ctx.contextlevel=".CONTEXT_COURSE.")
+            WHERE";
+            $sql .= " (( $fullnamesearch ) OR ( $summarysearch ) OR ( $idnumbersearch )) ";
+            $sql .= "ORDER BY category DESC";
+    } //end hack
     
     $courses = array();
 
