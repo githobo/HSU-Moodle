@@ -239,6 +239,11 @@ function init() {
     document.body.className += ' yui-skin-sam';
 }
 
+// Hide the panel on mouseover.
+YAHOO.graderreport.mouseoverPanelHandler = function () {
+    YAHOO.graderreport.panelEl.hide();
+}
+
 YAHOO.graderreport.mouseoverHandler = function (e) {
 
     var tempNode = '';
@@ -303,6 +308,7 @@ YAHOO.graderreport.mouseoverHandler = function (e) {
         YAHOO.graderreport.panelEl.setBody(tooltipNode.innerHTML);
         YAHOO.graderreport.panelEl.render(elTarget);
         YAHOO.graderreport.panelEl.show()
+        YAHOO.util.Event.on(document.getElementById('tooltipPanel'), 'mouseover', YAHOO.graderreport.mouseoverPanelHandler);
     }
 }
 
