@@ -407,7 +407,7 @@ function grade_print_tabs($active_type, $active_plugin, $plugin_info, $return=fa
 }
 
 function grade_get_plugin_info($courseid, $active_type, $active_plugin) {
-    global $CFG, $COURSE;
+    global $CFG;
 
     $context = get_context_instance(CONTEXT_COURSE, $courseid);
 
