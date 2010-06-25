@@ -143,6 +143,7 @@ $string['configgeoipfile'] = 'Location of GeoIP City binary data file. This file
 $string['configgetremoteaddrconf'] = 'If your server is behind a reverse proxy, you can use this setting to specify which HTTP headers can be trusted to contain the remote IP address. The headers are read in order, using the first one that is available.';
 $string['configgooglemapkey'] = 'You need to enter a special key to use Google Maps for IP address lookup visualization. You can obtain the key free of charge at <a href=\"http://code.google.com/apis/maps/signup.html\" >http://code.google.com/apis/maps/signup.html</a>.<br />Your web site URL is: $a';
 $string['configgradebookroles'] = 'This setting allows you to control who appears on the gradebook.  Users need to have at least one of these roles in a course to be shown in the gradebook for that course.';
+$string['configgradeexportdefault'] = 'Choose the default export format to use. This will make the format show up first on dropdown lists, and will be the default link on the gradebook tabs.';
 $string['configgradeexport'] = 'Choose which gradebook export formats are your primary methods for exporting grades.  Chosen plugins will then set and use a \"last exported\" field for every grade.  For example, this might result in exported records being identified as being \"new\" or \"updated\".  If you are not sure about this then leave everything unchecked.';
 $string['configguestroleid'] = 'This role is automatically assigned to the guest user. It is also temporarily assigned to not enrolled users when they enter course that allows guests without password. Please verify that the role has moodle/legacy:guest and moodle/course:view capability.';
 $string['confighiddenuserfields'] = 'Select which user information fields you wish to hide from other users other than course teachers/admins. This will increase student privacy. Hold CTRL key to select multiple fields.';
@@ -420,6 +421,7 @@ $string['gotofirst'] = 'Go to first missing string';
 $string['gradebook'] = 'Gradebook';
 $string['gradebookroles'] = 'Graded roles';
 $string['gradeexport'] = 'Primary grade export methods';
+$string['gradeexportformat'] = 'Default export format';
 $string['guestroleid'] = 'Role for guest';
 $string['helpadminseesall'] = 'Do admins see all calendar events or just those that apply to themselves?';
 $string['helpcalendarsettings'] = 'Configure various calendar and date/time-related aspects of Moodle';

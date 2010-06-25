@@ -3576,6 +3576,44 @@ class admin_setting_special_gradeexport extends admin_setting_configmulticheckbo
 }
 
 /**
+ * Default grade export format settings
+ */
+class admin_setting_exportgrade_format extends admin_setting_configselect {
+    function admin_setting_exportgrade_format() {
+        parent::admin_setting_configselect('grade_export_default', get_string('gradeexportformat', 'admin'), get_string('configgradeexportdefault', 'admin'), NULL);
+    }
+
+    function load_choices() {
+        if (is_array($this->choices)) {
+            return true;
+        }
+        $this->choices = array();
+
+        if ($plugins = get_list_of_plugins('grade/export')) {
+            foreach($plugins as $plugin) {
+                $this->choices[$plugin] = get_string('modulename', 'gradeexport_'.$plugin);
+            }
+        }
+        return true;
+    }
+
+    function get_defaultsetting() {
+        global $CFG;
+        if (empty($CFG->grade_export_default)) {
+            return NULL;
+        }
+        if ($plugins = get_list_of_plugins('grade/export')) {
+            if (in_array('xls',$plugins)) {
+                return 'xls';
+            } else {
+                return $plugins[0];
+            }
+        }
+
+    }
+}
+
+/**
  * Grade category settings
  */
 class admin_setting_gradecat_combo extends admin_setting {

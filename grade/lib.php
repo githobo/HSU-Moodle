@@ -407,7 +407,7 @@ function grade_print_tabs($active_type, $active_plugin, $plugin_info, $return=fa
 }
 
 function grade_get_plugin_info($courseid, $active_type, $active_plugin) {
-    global $CFG;
+    global $CFG, $COURSE;
 
     $context = get_context_instance(CONTEXT_COURSE, $courseid);
 
@@ -600,6 +600,20 @@ function grade_get_plugin_info($courseid, $active_type, $active_plugin) {
             }
         }
     }
+
+    // move default export format to front of array
+    $defaultexport = $CFG->grade_export_default;
+    if (!empty($exports) && !empty($defaultexport)) {
+        $newexports = array();
+        foreach ($exports as $key => $plugin) {
+            if ($plugin == $defaultexport) {
+                $newexports[] = $defaultexport;
+                unset($exports[$key]);
+            }
+        }
+        $exports = array_merge($newexports, $exports);
+    }
+
     $exportnames = array();
     if (!empty($exports)) {
         foreach ($exports as $plugin) {
@@ -610,7 +624,7 @@ function grade_get_plugin_info($courseid, $active_type, $active_plugin) {
             $exportnames[$plugin] = array('id' => $plugin, 'link' => $url, 'string' => get_string('modulename', 'gradeexport_'.$plugin));
             $count++;
         }
-        asort($exportnames);
+        //asort($exportnames);
     }
 
     if (!empty($exportnames)) {

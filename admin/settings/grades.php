@@ -54,6 +54,9 @@ if (has_capability('moodle/grade:manage', $systemcontext)
                                                          '3' => '3',
                                                          '4' => '4',
                                                          '5' => '5')));
+
+        $temp->add(new admin_setting_exportgrade_format());
+
         $temp->add(new admin_setting_configselect('grade_navmethod', get_string('navmethod', 'grades'), null, 0,
                                                   array(GRADE_NAVMETHOD_DROPDOWN => get_string('dropdown', 'grades'),
                                                         GRADE_NAVMETHOD_TABS => get_string('tabs', 'grades'),
