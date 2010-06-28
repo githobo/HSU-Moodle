@@ -131,19 +131,21 @@
         $role->shortname = $content_record->shortname;
         $roles_to_userid[$userid][] = $role;
 
-        foreach ($groups as $group) {
-	    $index = $userid .'_'. $content_record->username .'_'. $group->id;
-	    if (array_key_exists($index, $groupcontent)) {
+        if (!empty($groups)) {
+            foreach ($groups as $group) {
+                $index = $userid .'_'. $content_record->username .'_'. $group->id;
+                if (array_key_exists($index, $groupcontent)) {
 
-            	$record = $groupcontent[$index];
-                if (!isset($groupmembers_to_groupid[$record->userid])) {
-                    $groupmembers_to_groupid[$record->userid] = array();
+                    $record = $groupcontent[$index];
+                    if (!isset($groupmembers_to_groupid[$record->userid])) {
+                        $groupmembers_to_groupid[$record->userid] = array();
+                    }
+
+                    if (isset($groupmembers_to_groupid[$record->userid][$record->groupid])) {
+                        continue;
+                    }
+                    $groupmembers_to_groupid[$record->userid][$record->groupid] = $groups[$record->groupid];
                 }
-            
-                if (isset($groupmembers_to_groupid[$record->userid][$record->groupid])) {
-                    continue;
-                }
-                $groupmembers_to_groupid[$record->userid][$record->groupid] = $groups[$record->groupid];
             }
         }
 
