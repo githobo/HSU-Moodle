@@ -26,6 +26,7 @@ $string['menuitems'] = 'Items to include on the menu';
 $string['moodle_manuals'] = 'Moodle Manuals';
 $string['other_controls'] = 'Other Controls';
 $string['participantsdesc'] = 'Use this link to view the students and teachers in your course. You can click their name to view their full profile, send them an email, etc.';
+$string['passworddesc'] = 'This link will take you to Account Center where you can change your password.';
 $string['profiledesc'] = 'This link will let you change your personal information, upload a picture, change your password, etc.';
 $string['restoredesc'] = 'This link will allow you to restore a backed up course, either with data to the current course, or to another course you are a administrator of.';
 $string['rolesdesc'] = 'Use this link to assign teachers, students, or teaching assistants who aren\'t officially enrolled in your course.';

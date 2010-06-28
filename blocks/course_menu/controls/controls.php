@@ -38,7 +38,7 @@ if ($editcourse) {
 }
 if ((is_dir($CFG->dirroot.'/blocks/quickmail')) && $canemail) {
     $rows[] = array('<img src="'.$CFG->pixpath.'/i/email.gif" alt="quickmail" align="texttop" class="icon" />',
-                           '<a href="'.$CFG->wwwroot.'/blocks/quickmail/email.php?id='.$course->id.'">'.get_string('emailstudents', 'block_course_menu').'</a>',
+                           '<a href="'.$CFG->wwwroot.'/blocks/quickmail/email.php?id='.$course->id.'&instanceid='.$coursecontext->instanceid.'">'.get_string('emailstudents', 'block_course_menu').'</a>',
                            get_string('emaildesc', 'block_course_menu')
                      );
 }
