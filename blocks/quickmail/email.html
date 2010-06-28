@@ -39,15 +39,6 @@
 <form name="theform" method="post" action="email.php" enctype="multipart/form-data">
 <table border="0" cellpadding="5" id="maintable">
 <tr>
-  <td colspan="2" align="right">
-    <?php
-        if ($quickmail->check_permission('block/quickmail:cansend', CONTEXT_COURSE, $course)) {
-        echo '<a href="emaillog.php?id='. $course->id . '&amp;instanceid='. $instance->id.'">'. get_string('emailhistory', 'block_quickmail'). '</a>';
-        }    
-  ?>
-  </td>
-</tr>
-<tr>
   <td align="right"><b>From:</b></td>
   <td align="left"><?php echo $USER->email; ?></td>
 </tr>
@@ -56,7 +47,7 @@
     <td align="right"><div align="center"></div></td>
     
     <td width = "200">
-    <table width="200"><tr><td align="left" width="200"><div align="right"><strong><?php print_string('to', 'block_quickmail'); ?></strong></div></td></tr>
+    <table width="200"><tr><td align="left" width="200"><div align="center"><strong><?php print_string('to', 'block_quickmail'); ?></strong></div></td></tr>
     <tr>
     <td width="250">
         <div align="left">
@@ -109,7 +100,7 @@
     <table width="250">
     
     <!-- Creates sections for role selection-->
-    <tr><td align="right" width="250"><div align="right"><strong><?php print_string('rolefilter', 'block_quickmail'); ?></strong></div></td></tr>
+    <tr><td align="right" width="250"><div align="center"><strong><?php print_string('rolefilter', 'block_quickmail'); ?></strong></div></td></tr>
     <tr>
         <td width="250"><div align="right">
             <select id="roles" onchange="special_select_users()" style="width:250px">
@@ -124,7 +115,7 @@
         </td>
     </tr>
 
-    <tr><td align="right" width="250"><div align="right"><strong><?php print_string('potentialgroups', 'block_quickmail'); ?></strong></div></td></tr>
+    <tr><td align="right" width="250"><div align="center"><strong><?php print_string('potentialgroups', 'block_quickmail'); ?></strong></div></td></tr>
 <tr>
 <td width="250"><div align="right">
 <!-- Populate members list from $groups that stores list of groups in the course -->
@@ -141,7 +132,7 @@
       </select>
 
     </div></td></tr>
-     <tr><td align="right" width="250"><div align="right"><strong><?php print_string('potentialreceipent', 'block_quickmail'); ?></strong></div></td></tr>
+     <tr><td align="right" width="250"><div align="center"><strong><?php print_string('potentialreceipent', 'block_quickmail'); ?></strong></div></td></tr>
     <tr><td width="250"><div align="right">
   
       <!-- Populate members list from $courseusers that stores list of users in the course -->		  
@@ -199,38 +190,6 @@
 -->
 
 
-<tr>
-    <td align="right" nowrap="nowrap">
-        <strong><?php print_string('attachmentoptional', 'block_quickmail'); ?>(s):</strong>
-    </td>
-</tr>
-
-<tr valign="top" id="attach_1row">
-    <td align="right" nowrap="nowrap">
-    </td>
-    <td colspan="2">
-    <?php
-            $maxbytes = get_max_upload_file_size($CFG->maxbytes, $course->maxbytes);
-            echo '<input type="hidden" name="MAX_FILE_SIZE" value="'.$maxbytes.'" />';
-            echo '<input id="attach_1" type="file" name="attach_1" size="45" alt="'.get_string('attachmentalt', 'block_quickmail').'" onchange="javascript:create_new_attachment(\'attach_1\')"/> ';
-        //}
-    ?>
-    </td>
-</tr>
-
-<tr>
-    <td></td>
-    <td colspan="2">
-        <?php
-            echo '<b><font color= color= color="#000000">';
-			print_string('maxattachmentsize', 'block_quickmail'); echo ': 10MB'; //display_size($maxbytes);
-			echo'<br>';
-			//print_string('useextclient','block_quickmail');
-			echo '</b></font>';
-        ?>
-    </td>
-</tr>
-
 <tr valign="top">
     <td align="right"><b><?php print_string('subject', 'forum'); ?>:</b></td>
     <td colspan="3">
@@ -281,6 +240,24 @@
  	echo '<input type="hidden" name="format" value="'.FORMAT_HTML.'" />';
 ?>
 
+<tr valign="top" id="attach_1row">
+    <td align="right" nowrap="nowrap">
+        <strong><?php print_string('attachmentoptional', 'block_quickmail'); ?>:</strong>
+    </td>
+    <td colspan="2">
+    <?php
+            $maxbytes = get_max_upload_file_size($CFG->maxbytes, $course->maxbytes);
+            echo '<input type="hidden" name="MAX_FILE_SIZE" value="'.$maxbytes.'" />';
+            echo '<input id="attach_1" type="file" name="attach_1" size="45" alt="'.get_string('attachmentalt', 'block_quickmail').'" onchange="javascript:create_new_attachment(\'attach_1\')"/> ';
+    ?>
+    </td>
+    <td>
+        <?php
+            print_string('maxattachmentsize', 'block_quickmail');
+            echo ': ' . $maxbytes/1024/1024 . 'MB';
+        ?>
+    </td>
+</tr>
 
 
 <tr>
@@ -305,6 +282,17 @@
     <input type="submit" name="sendemail" value="<?php print_string('sendemail', 'block_quickmail') ?>" onClick = "updateList()"/>
     </td>
 </tr>
+
+<tr>
+  <td align="center" colspan="4">
+    <?php
+        if ($quickmail->check_permission('block/quickmail:cansend', CONTEXT_COURSE, $course)) {
+        echo '<a href="emaillog.php?id='. $course->id . '&amp;instanceid='. $instance->id.'">'. get_string('emailhistory', 'block_quickmail'). '</a>';
+        }
+  ?>
+  </td>
+</tr>
+
 </table>
 </form>
 <script language="Javascript">
