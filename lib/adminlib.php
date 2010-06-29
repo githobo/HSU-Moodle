@@ -3580,7 +3580,7 @@ class admin_setting_special_gradeexport extends admin_setting_configmulticheckbo
  */
 class admin_setting_exportgrade_format extends admin_setting_configselect {
     function admin_setting_exportgrade_format() {
-        parent::admin_setting_configselect('grade_export_default', get_string('gradeexportformat', 'admin'), get_string('configgradeexportdefault', 'admin'), NULL);
+        parent::admin_setting_configselect('grade_export_default', get_string('gradeexportformat', 'admin'), get_string('configgradeexportdefault', 'admin'), NULL, NULL);
     }
 
     function load_choices() {
