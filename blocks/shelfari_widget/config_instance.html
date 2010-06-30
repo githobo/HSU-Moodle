@@ -1,7 +1,7 @@
 <?php print_simple_box_start();
 
 if (!empty($this->config->shelfarinum)) {
-    $shelfarinum = $this->config->shelfarinum;
+    $shelfarinum = filter_var($this->config->shelfarinum, FILTER_SANITIZE_NUMBER_INT);
 } else {
     $shelfarinum = '';
 }
@@ -14,7 +14,7 @@ if (!empty($this->config->shelfarinum)) {
 
 <div class="row">
     <span class="label"><?php print_string('getnumber', 'block_shelfari_widget'); ?></span>
-    <span class="formw"><?php print_textfield('shelfarinum', $shelfarinum, '', 7, false); ?></span>
+    <span class="formw"><?php print_textfield('shelfarinum', $shelfarinum, '', 7, 6); ?></span>
 </div>
 
 <div class="row">
