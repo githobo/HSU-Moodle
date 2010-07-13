@@ -1,0 +1,112 @@
+body.mod-turningtech {
+	text-align: center;
+}
+
+.clear-both {
+  clear: both;
+}
+
+ul#turningtech-actions {
+  display: block;
+}
+
+ul#turningtech-actions li {
+  display: inline;
+  margin-left: 1em;
+}
+
+ul#turningtech-actions li.active {
+  font-weight: bold;
+}
+
+/** block styles **/
+div.block_turningpoint h2 {
+  background: transparent url(../images/ttech_icon.png) no-repeat scroll center left;
+  padding-left: 20px;
+  min-height: 18px;
+}
+
+/** student device management page **/
+.rw-image-container {
+	display: block;
+	width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.responsecard-container {
+  width: 200px;
+  float: left;
+}
+
+.responseware-container {
+  width: 200px;
+  float: left;
+  margin-left: 50px;
+}
+
+.device-divider {
+  width: 80%;
+  color: #00f;
+  background-color: #00f;
+  margin-top: 2em;
+  margin-bottom: 2emp;
+}
+
+p.no-devices {
+	color: #f00;
+}
+
+div.form-container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  text-align: left;
+}
+
+/** collapsible block behavior **/
+#turningtech-device-page h3.collapsed {
+  font-weight: bold;
+}
+
+#turningtech-device-page div.collapsed {
+	display: none;
+}
+
+#turningtech-device-page h3.uncollapsed {
+  font-style: italic;
+}
+
+#turningtech-device-page div.uncollapsed {
+  display: block;
+}
+
+/** modification to form for device management page **/
+
+div.responsecard-group, div.responseware-group {
+  margin: auto;
+  display: block;
+  width: 750px;
+}
+
+#turningtech-device-page form#mform2,
+#turningtech-device-page form#mform1 {
+  width: 500px;
+  margin-left: 1em;
+  float: left;
+}
+
+#turningtech-device-page #turningtechdevicemapheader legend,
+#turningtech-device-page #responsewareheader legend {
+  display: none;
+}
+
+img.enterid, p.responseware-join-link {
+  float: right;
+  margin-right: 1em;
+  margin-top: 0.5em;
+}
+
+p.responseware-join-link {
+  width: 185px;
+}
