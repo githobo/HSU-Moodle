@@ -59,6 +59,18 @@ function xmldb_assignment_upgrade($oldversion=0) {
         $db->debug = true;
     }
 
+//===== HSU mod - add student notification option ======//
+    
+    if ($result && $oldversion < 2010072200) {
+    /// Define field emailstudents to be added to assignment
+        $table = new XMLDBTable('assignment');
+        $field = new XMLDBField('emailstudents');
+        $field->setAttributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, '0', 'emailteachers');
+
+    /// Launch add field emailstudents
+        $result = $result && add_field($table, $field);
+    }
+
     return $result;
 }
 

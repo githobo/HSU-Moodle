@@ -72,6 +72,7 @@ class assignment_online extends assignment_base {
                 add_to_log($this->course->id, 'assignment', 'upload',
                         'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
                 $this->email_teachers($submission);
+                $this->email_students($submission); //HSU mod to notify student
                 //redirect to get updated submission date and word count
                 redirect('view.php?id='.$this->cm->id.'&saved=1');
             } else {
@@ -254,6 +255,12 @@ class assignment_online extends assignment_base {
         $mform->addElement('select', 'emailteachers', get_string("emailteachers", "assignment"), $ynoptions);
         $mform->setHelpButton('emailteachers', array('emailteachers', get_string('emailteachers', 'assignment'), 'assignment'));
         $mform->setDefault('emailteachers', 0);
+
+        //HSU mod to notify students of successful upload
+        $mform->addElement('select', 'emailstudents', get_string("emailstudents", "assignment"), $ynoptions);
+        $mform->setHelpButton('emailstudents', array('emailstudents', get_string('emailstudents', 'assignment'), 'assignment'));
+        $mform->setDefault('emailstudents', 0);
+        //end HSU mod
 
         $mform->addElement('select', 'var1', get_string("commentinline", "assignment"), $ynoptions);
         $mform->setHelpButton('var1', array('commentinline', get_string('commentinline', 'assignment'), 'assignment'));

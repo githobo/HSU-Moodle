@@ -602,6 +602,7 @@ class assignment_upload extends assignment_base {
                         'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
                 $submission = $this->get_submission($USER->id);
                 $this->update_grade($submission);
+                $this->email_students($submission); //HSU mod to notify students
                 if (!$this->drafts_tracked()) {
                     $this->email_teachers($submission);
                 }
@@ -1052,6 +1053,12 @@ class assignment_upload extends assignment_base {
         $mform->setHelpButton('emailteachers', array('emailteachers', get_string('emailteachers', 'assignment'), 'assignment'));
         $mform->setDefault('emailteachers', 0);
 
+        //HSU mod
+        $mform->addElement('select', 'emailstudents', get_string("emailstudents", "assignment"), $ynoptions);
+        $mform->setHelpButton('emailstudents', array('emailstudents', get_string('emailstudents', 'assignment'), 'assignment'));
+        $mform->setDefault('emailstudents', 0);
+        //end HSU mod
+        
         $mform->addElement('select', 'var4', get_string("trackdrafts", "assignment"), $ynoptions);
         $mform->setHelpButton('var4', array('trackdrafts', get_string('trackdrafts', 'assignment'), 'assignment'));
         $mform->setDefault('var4', 1);

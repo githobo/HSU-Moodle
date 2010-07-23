@@ -38,6 +38,10 @@ $string['duedate'] = 'Due date';
 $string['duedateno'] = 'No due date';
 $string['early'] = '$a early';
 $string['editmysubmission'] = 'Edit my submission';
+$string['emailstudentmail'] = 'Your assignment submission
+for \'$a->assignment\' has been uploaded successfully.';
+$string['emailstudenthtml'] = 'Your assignment submission
+for <i>\'$a->assignment\'</i> has been uploaded successfully.';
 $string['emailstudents'] = 'Email alerts to students';
 $string['emailteachermail'] = '$a->username has updated their assignment submission
 for \'$a->assignment\'

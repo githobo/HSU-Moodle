@@ -1586,6 +1586,41 @@ class assignment_base {
     }
 
     /**
+     * HSU mod to alert students by email that their assignment uploaded without errors
+     *
+     * First checks whether the option to email students is set for this assignment.
+     * Uses the methods email_students_text() and email_students_html() to construct the content.
+     * @param $submission object The submission that has changed
+     */
+    function email_students($submission) {
+        global $CFG;
+
+        if (empty($this->assignment->emailstudents)) {          // No need to do anything
+            return;
+        }
+
+        $from = "Moodle System";
+        $user = get_record('user', 'id', $submission->userid);
+
+        $strassignments = get_string('modulenameplural', 'assignment');
+        $strassignment  = get_string('modulename', 'assignment');
+        $strsubmitted  = get_string('submitted', 'assignment');
+
+        $info = new object();
+        $info->username = fullname($user, true);
+        $info->assignment = format_string($this->assignment->name,true);
+        $info->url = $CFG->wwwroot.'/mod/assignment/submissions.php?id='.$this->cm->id;
+
+        $postsubject = $strsubmitted.': '.$info->username.' -> '.$this->assignment->name;
+        $posttext = $this->email_students_text($info);
+        $posthtml = ($user->mailformat == 1) ? $this->email_students_html($info) : '';
+
+        @email_to_user($user, $from, $postsubject, $posttext, $posthtml);          
+    }
+
+
+
+    /**
      * Returns a list of teachers that should be grading given submission
      */
     function get_graders($user) {
@@ -1656,6 +1691,39 @@ class assignment_base {
                      '<a href="'.$CFG->wwwroot.'/mod/assignment/view.php?id='.$this->cm->id.'">'.format_string($this->assignment->name).'</a></font></p>';
         $posthtml .= '<hr /><font face="sans-serif">';
         $posthtml .= '<p>'.get_string('emailteachermailhtml', 'assignment', $info).'</p>';
+        $posthtml .= '</font><hr />';
+        return $posthtml;
+    }
+
+    /**
+     * HSU mod  to create the text content for emails to students
+     *
+     * @param $info object The info used by the 'emailstudentmail' language string
+     * @return string
+     */
+    function email_students_text($info) {
+        $posttext  = format_string($this->course->shortname).' -> '.$this->strassignments.' -> '.
+                     format_string($this->assignment->name)."\n";
+        $posttext .= '---------------------------------------------------------------------'."\n";
+        $posttext .= get_string("emailstudentmail", "assignment", $info)."\n";
+        $posttext .= "\n---------------------------------------------------------------------\n";
+        return $posttext;
+    }
+
+     /**
+     * HSU mod to create the html content for emails to students
+     *
+     * @param $info object The info used by the 'emailstudentmailhtml' language string
+     * @return string
+     */
+    function email_students_html($info) {
+        global $CFG;
+        $posthtml  = '<p><font face="sans-serif">'.
+                     '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$this->course->id.'">'.format_string($this->course->shortname).'</a> ->'.
+                     '<a href="'.$CFG->wwwroot.'/mod/assignment/index.php?id='.$this->course->id.'">'.$this->strassignments.'</a> ->'.
+                     '<a href="'.$CFG->wwwroot.'/mod/assignment/view.php?id='.$this->cm->id.'">'.format_string($this->assignment->name).'</a></font></p>';
+        $posthtml .= '<hr /><font face="sans-serif">';
+        $posthtml .= '<p>'.get_string('emailstudentmailhtml', 'assignment', $info).'</p>';
         $posthtml .= '</font><hr />';
         return $posthtml;
     }

@@ -50,6 +50,7 @@
             $assignment->resubmit = backup_todb($info['MOD']['#']['RESUBMIT']['0']['#']);
             $assignment->preventlate = backup_todb($info['MOD']['#']['PREVENTLATE']['0']['#']);
             $assignment->emailteachers = backup_todb($info['MOD']['#']['EMAILTEACHERS']['0']['#']);
+            $assignment->emailstudents = backup_todb($info['MOD']['#']['EMAILSTUDENTS']['0']['#']); //HSU mod
             $assignment->var1 = backup_todb($info['MOD']['#']['VAR1']['0']['#']);
             $assignment->var2 = backup_todb($info['MOD']['#']['VAR2']['0']['#']);
             $assignment->var3 = backup_todb($info['MOD']['#']['VAR3']['0']['#']);

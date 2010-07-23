@@ -131,6 +131,7 @@ class assignment_uploadsingle extends assignment_base {
                                 'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
                         $submission = $this->get_submission($USER->id);
                         $this->update_grade($submission);
+                        $this->email_students($submission); //HSU mod to notify students
                         $this->email_teachers($submission);
                         print_heading(get_string('uploadedfile'));
                     } else {
@@ -145,6 +146,7 @@ class assignment_uploadsingle extends assignment_base {
                                 'view.php?a='.$this->assignment->id, $this->assignment->id, $this->cm->id);
                         $submission = $this->get_submission($USER->id);
                         $this->update_grade($submission);
+                        $this->email_students($newsubmission); //HSU mod to notify students
                         $this->email_teachers($newsubmission);
                         print_heading(get_string('uploadedfile'));
                     } else {
@@ -173,6 +175,12 @@ class assignment_uploadsingle extends assignment_base {
         $mform->addElement('select', 'emailteachers', get_string("emailteachers", "assignment"), $ynoptions);
         $mform->setHelpButton('emailteachers', array('emailteachers', get_string('emailteachers', 'assignment'), 'assignment'));
         $mform->setDefault('emailteachers', 0);
+
+        //HSU mod to notify students by email that assignment uploaded successfully
+        $mform->addElement('select', 'emailstudents', get_string("emailstudents", "assignment"), $ynoptions);
+        $mform->setHelpButton('emailstudents', array('emailstudents', get_string('emailstudents', 'assignment'), 'assignment'));
+        $mform->setDefault('emailstudents', 0);
+        //end HSU mod
 
         $choices = get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
         $choices[0] = get_string('courseuploadlimit') . ' ('.display_size($COURSE->maxbytes).')';
