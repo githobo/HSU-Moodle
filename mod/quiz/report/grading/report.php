@@ -403,8 +403,15 @@ class quiz_report extends quiz_default_report {
                 $a->fullname = fullname($attempt, true);
                 $a->attempt = $attempt->attempt;
 
-                // print the user name, attempt count, the question, and some more hidden fields
+                //HSU mod to display user picture when manually grading
+                if ($user = get_record("user", "id", $attempt->userid)) {
+                    $picture = print_user_picture($user->id, $quiz->course, $user->picture, false, true);
+                }
+                //end HSU mod
+
+                // print the user name, picture, attempt count, the question, and some more hidden fields
                 echo '<div class="boxaligncenter" width="80%" style="clear:left;padding:15px;">';
+                echo $picture;  //HSU mod to display user picture when manually grading
                 echo "<span$gradedclass>".get_string('gradingattempt','quiz_grading', $a);
                 echo $gradedstring."</span>";
 
