@@ -1599,7 +1599,7 @@ class assignment_base {
             return;
         }
 
-        $from = "Moodle System";
+        $from = "Moodle";
         $user = get_record('user', 'id', $submission->userid);
 
         $strassignments = get_string('modulenameplural', 'assignment');
