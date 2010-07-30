@@ -1475,8 +1475,9 @@ class grade_report_grader extends grade_report {
      * @return bool
      */
     function is_fixed_students() {
-        global $USER, $CFG;
-        return empty($USER->screenreader) && $CFG->grade_report_fixedstudents && 
+        //HSU mod to allow plugin of LAE grader report
+        global $USER;
+        return empty($USER->screenreader) && $this->get_pref('fixedstudents') &&
             (check_browser_version('MSIE', '7.0') || 
              check_browser_version('Firefox', '2.0') ||
              check_browser_version('Gecko', '2006010100') ||
