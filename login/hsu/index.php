@@ -73,7 +73,7 @@
 <a href="http://www.humboldt.edu/~moodle/logintrouble.html">Login Trouble?</a>
 </div></il>
 		<li id="home"><a href="index.php">Home</a></li>
-		<li><a href="http://www.humboldt.edu/~moodle">Moodle Support</a></li>
+		<li><a href="http://www.humboldt.edu/its/moodle">Moodle Support</a></li>
 		<li><a href="http://moodle.org">Moodle.org</a></li>
     	<li><a href="mailto:mdlsos@humboldt.edu">Contact Us</a></li>
 		</ul>
