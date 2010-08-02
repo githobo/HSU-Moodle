@@ -826,8 +826,17 @@ class grade_report_LAEgrader extends grade_report_grader {
                     $cellclasses .= ' excluded';
                 }
 
-                //HSU mod - removed tooltips for this grader report as they are redundant with proper scrollbars
-                $studentshtml .= '<td class="'.$cellclasses.'" >';
+                $grade_title = '<div class="fullname">'.fullname($user).'</div>';
+                $grade_title .= '<div class="itemname">'.$item->get_name(true).'</div>';
+
+                if (!empty($grade->feedback) && !$USER->gradeediting[$this->courseid]) {
+                    $grade_title .= '<div class="feedback">'
+                                 .wordwrap(trim(format_string($grade->feedback, $grade->feedbackformat)), 34, '<br/ >') . '</div>';
+                } else {
+
+                }
+
+                $studentshtml .= '<td class="'.$cellclasses.'" title="'.s($grade_title).'">';
 
                 if ($grade->is_excluded()) {
                     $studentshtml .= '<span class="excludedfloater">'.get_string('excluded', 'grades') . '</span> ';
