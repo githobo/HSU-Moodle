@@ -789,6 +789,7 @@ class resource_file extends resource_base {
 
         $mform->addElement('choosecoursefile', 'reference', get_string('location'), null, array('maxlength' => 255, 'size' => 48));
         $mform->setDefault('reference', $CFG->resource_defaulturl);
+        $mform->setDefault('forcedownload', 'forcedownload');   //HSU mod for accessibility
         $mform->addGroupRule('reference', array('value' => array(array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client'))));
         $mform->addRule('name', null, 'required', null, 'client');
 
