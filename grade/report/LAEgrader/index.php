@@ -132,6 +132,8 @@ if ($data = data_submitted() and confirm_sesskey() and has_capability('moodle/gr
 $report->load_users();
 $numusers = $report->get_numusers();
 $report->load_final_grades();
+//HSU mod to display warning for enhanced grade report
+$fixedstudents = $report->is_fixed_students();
 
 // AT THIS POINT WE HAVE ACCURATE GRADES FOR DISPLAY
 
@@ -141,6 +143,10 @@ if ($action === 'quick-dump') {
 
 /// Print header
 print_grade_page_head($COURSE->id, 'report', 'LAEgrader', $reportname, false, null, $buttons);
+//HSU mod to display warning for enhanced grade report
+if ($fixedstudents) {
+    print("<h3 align=\"center\">To use this grade report go into My preferences and set Static student column to No.</h3>");
+}
 
 echo $report->group_selector;
 echo '<div class="clearer"></div>';
