@@ -119,7 +119,7 @@ class block_course_menu extends block_base {
             }
             //quickmail link
             if ((is_dir($CFG->dirroot.'/blocks/quickmail')) && has_capability('block/quickmail:cansend', $coursecontext)) {
-                $this->content->text .= $tab2.'var myobj = { label: "' . get_string('blockname', 'block_quickmail') .'", href: "' . $CFG->wwwroot . '/blocks/quickmail/email.php?id='.$this->course->id. '" };'.$cr;
+                $this->content->text .= $tab2.'var myobj = { label: "' . get_string('blockname', 'block_quickmail') .'", href: "' . $CFG->wwwroot . '/blocks/quickmail/email.php?id='.$this->course->id. '&instanceid=' . $this->instance->id . '" };'.$cr;
                 $this->content->text .= $tab2.'var qckMail = new YAHOO.widget.TextNode(myobj, tmpNode, false);' . $cr;
                 $this->content->text .= $tab2.'qckMail.labelStyle = "icon-eml";'.$cr;
             }
