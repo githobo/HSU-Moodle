@@ -37,13 +37,14 @@ if ($editcourse) {
                      );
 }
 if ((is_dir($CFG->dirroot.'/blocks/quickmail')) && $canemail) {
-    $quickmailblock = get_record('block', 'name', 'quickmail');
-    if ($quickmailinstance = get_record('block_instance', 'pageid', $course->id, 'blockid', $quickmailblock->id)) {
-        $rows[] = array('<img src="'.$CFG->pixpath.'/i/email.gif" alt="quickmail" align="texttop" class="icon" />',
-                               '<a href="'.$CFG->wwwroot.'/blocks/quickmail/email.php?id='.$course->id.'&instanceid='.$quickmailinstance->id.'">'.get_string('emailstudents', 'block_course_menu').'</a>',
-                               get_string('emaildesc', 'block_course_menu')
-                         );
-    }
+    $coursemenublock = get_record('block', 'name', 'course_menu');
+    $quickmailinstance = get_record('block_instance', 'pageid', $course->id, 'blockid', $coursemenublock->id);
+
+    $rows[] = array('<img src="'.$CFG->pixpath.'/i/email.gif" alt="quickmail" align="texttop" class="icon" />',
+                           '<a href="'.$CFG->wwwroot.'/blocks/quickmail/email.php?id='.$course->id.'&instanceid='.$quickmailinstance->id.'">'.get_string('emailstudents', 'block_course_menu').'</a>',
+                           get_string('emaildesc', 'block_course_menu')
+                     );
+    
 }
 if ($managefiles) {
     $rows[] = array('<img src="'.$CFG->pixpath.'/i/files.gif"  alt="course files" align="texttop" class="icon" />',
