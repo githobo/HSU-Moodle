@@ -6,7 +6,7 @@
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-us" />
 
-<title>Login: HSU Moodle</title>
+<title>Login Trouble?</title>
 
 <link rel='stylesheet' type='text/css' media='all' href='styles/main.css' />
 <style type='text/css' media='screen'>
@@ -26,7 +26,7 @@
 <div class="skipper"><a href="#nav-secondary">Skip to secondary navigation</a></div><div class="skipper"><a href="#text">Skip to content</a></div>
 
 <div id="nav-main">
- 
+
     	<ul>
           <il><div id="login">
 <h2 class="login">Login to Moodle</h2>
@@ -72,7 +72,7 @@
 <?php } ?>
 <a href="logintrouble.php">Login Trouble?</a>
 </div></il>
-		<li id="home"><a href="index.php">Home</a></li>
+		<li><a href="index.php">Home</a></li>
 		<li><a href="http://www.humboldt.edu/its/moodle">Moodle Support</a></li>
 		<li><a href="http://moodle.org">Moodle.org</a></li>
     	<li><a href="mailto:mdlsos@humboldt.edu">Contact Us</a></li>
@@ -81,39 +81,32 @@
 
 <div id="content">
 
-<h1>Moodle at Humboldt State University</h1>
+<h1>Login Trouble?</h1>
 
 <div id="news">
-<h3>News and Updates</h3>
-<?php
-	require_once('../../config.php');
-    require_once($CFG->dirroot .'/lib/dmllib.php');
-    require_once($CFG->dirroot .'/lib/weblib.php');
-    if (!$sitenews = get_record('forum', 'course', SITEID, 'type', 'news', null, null, 'id')) {
-        //no site forum
-        echo '<p>There is no news.</p>';
-    } else {
-        if (!$discussions = get_records('forum_discussions', 'forum', $sitenews->id, 'timemodified DESC', '*', '', '5')) {
-            echo '<p>There is no news.</p>';
-        } else {
-            foreach ($discussions as $discussion) {
-                $name = format_text($discussion->name, FORMAT_PLAIN);
-                if ($firstpost = get_record('forum_posts', 'id', $discussion->firstpost)) {
-                    print("<h4>$name</h4>");
-                    $message = format_text($firstpost->message);
-                    print($message);
-                }
-            }
-            print('<p>For past upates check out the <a href="'.$CFG->wwwroot.'/mod/forum/view.php?f='.$sitenews->id.'">News and Updates forum</a>.</p>');
-        }
-    }
-?>
+
+    <br/>
+<p>If you are having trouble logging in to Moodle please check the following:
+    <ul>
+        <li>Verify that you are using your HSU user name (e.g. mdl42) in the user name field and your HSU Password</li>
+        <li>Verify that your browser is configured to accept cookies</li>
+    </ul>
+</p>
+
+<p>
+    If you have forgotten your HSU user name or password you can visit the <a href="http://www.humboldt.edu/reset">Password Reset</a> page.
+</p>
+
+<p>
+    If you still can't get logged in please send an email to <a href="mailto:help@humboldt.edu">help@humboldt.edu</a> or call the Help Desk at 707.826.HELP (4357).
+</p>
+
 </div>
 </div>
 <div class="clearer"></div>
 </div>
 
 <div id="contact"><p>Library 315 • 1 Harpst St., Arcata, CA 95521 • 707.826.3633 • <a href="mailto:mdlsos@humboldt.edu">Contact Us</a>.</p></div>
- 
+
 </body>
 </html>
