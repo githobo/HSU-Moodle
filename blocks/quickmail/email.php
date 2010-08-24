@@ -97,7 +97,7 @@
     
     $sql = "SELECT DISTINCT CONCAT(r.id, '_', usr.username), r.id AS roleid, r.name, 
             r.shortname, usr.id AS userid, usr.username, usr.email, usr.firstname, 
-            usr.lastname
+            usr.lastname, usr.mailformat
      FROM mdl_course AS c         
         INNER JOIN mdl_context AS cx ON cx.id={$context->id}
         INNER JOIN mdl_role_assignments AS ra ON cx.id = ra.contextid
@@ -108,7 +108,7 @@
     $dbcontent = get_records_sql($sql);
 
     $sql = "SELECT CONCAT(u.id, '_', u.username, '_', g.id) AS uniquecode, 
-                   u.id AS userid, g.id AS groupid, g.name 
+                   u.id AS userid, g.id AS groupid, g.name
             FROM mdl_user AS u, 
                  mdl_groups AS g, 
                  mdl_groups_members AS gm 
@@ -158,6 +158,7 @@
         $user->lastname = $content_record->lastname;
         $user->email = $content_record->email;
         $user->id = $userid;
+        $user->mailformat = $content_record->mailformat;
         $courseusers[$userid] = $user;
     }
 
@@ -170,6 +171,8 @@
     $readonly       = '';
     $strchooseafile = get_string('chooseafile', 'resource');
     $strquickmail   = get_string('blockname', 'block_quickmail');
+    // HSU mod to add help button on compose email page
+    $helpstring     = "&nbsp;<a target=\"popup\" title=\"Quickmail\" href=\"../../help.php?module=moodle&file=quickmail.html\" onclick=\"return openpopup(\'/help.php?module=moodle&file=quickmail.html\', \'popup\', \'menubar=0,location=0,scrollbars,resizable,width=500,height=400\', 0);\"><img height='17' width='17' alt='quickmail' src='../../pix/help.gif' /></a>";
  
     $navigation = array(
                 array('name' => $course->shortname, 'link' => "{$CFG->wwwroot}/course/view.php?id=$course->id", 'type'=> 'title'),
@@ -372,7 +375,8 @@
     }
 
     // print the email form START
-    print_heading($strquickmail);
+    // HSU mod to add help button on compose email page
+    print_heading($strquickmail . $helpstring);
     
     // error printing
     if (isset($form->error)) {
@@ -531,7 +535,7 @@
          $mail->AltBody =  "\n$messagetext\n";
      } else {
          $mail->IsHTML(false);
-     $mail->Body =  "\n$messagetext\n";
+         $mail->Body =  "\n$messagetext\n";
      }
  
      if ($attachment) {
