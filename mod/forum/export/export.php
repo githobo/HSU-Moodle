@@ -17,8 +17,8 @@
 	if (!$course = get_record('course', 'id', $cm->course)) {
 		print_error('Course incorrect');
 	}
-	
-	$context = get_context_instance(CONTEXT_MODULE, $forumid);
+
+	$context = get_context_instance(CONTEXT_MODULE, $cm->id);
 	require_capability('mod/forum:viewposters', $context);
 	
 	$navigation = build_navigation(get_string('export', 'forum'), $cm);
