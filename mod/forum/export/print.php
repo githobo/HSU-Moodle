@@ -19,7 +19,7 @@
 		print_error('Course incorrect');
 	}
 	
-	$context = get_context_instance(CONTEXT_MODULE, $forumid);
+	$context = get_context_instance(CONTEXT_MODULE, $cm->id);
 	require_capability('mod/forum:viewposters', $context);
 
 	print_header(get_string('exportforum', 'forum'), '', '', '');
