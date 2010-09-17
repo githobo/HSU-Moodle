@@ -22,6 +22,7 @@ $string['allowsallsubscribe'] = 'This forum allows everyone to choose whether to
 $string['allowsdiscussions'] = 'This forum allows each person to start one discussion topic.';
 $string['allsubscribe'] = 'Subscribe to all forums';
 $string['allunsubscribe'] = 'Unsubscribe from all forums';
+$string['alwaysedit'] = "Always Allow Editing?";
 $string['allusers'] = 'All users';
 $string['anonymous'] = 'Anonymous';
 $string['anonymouswarning'] = 'By moving this discussion topic you might reveal anonymous information. Are you sure you want to do that?';

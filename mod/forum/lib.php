@@ -3194,7 +3194,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $editanypost = $cm->cache->caps['mod/forum:editanypost'];
 
     if ($ownpost or $editanypost) {
-        if (($age < $CFG->maxeditingtime) or $editanypost) {
+        if (($age < $CFG->maxeditingtime) or $editanypost or $forum->alwaysedit) {
             $commands[] =  '<a href="'.$CFG->wwwroot.'/mod/forum/post.php?edit='.$post->id.'">'.$stredit.'</a>';
         }
     }

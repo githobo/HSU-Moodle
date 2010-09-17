@@ -49,6 +49,15 @@ class mod_forum_mod_form extends moodleform_mod {
         $mform->addElement('select', 'forcesubscribe', get_string('forcesubscribeq', 'forum'), $options);
         $mform->setHelpButton('forcesubscribe', array('subscription2', get_string('forcesubscribeq', 'forum'), 'forum'));
 
+
+  //option to always allow editing of posts
+        $options = array();
+        $options[0] = get_string('no');
+        $options[1] = get_string('yes');
+        $mform->addElement('select', 'alwaysedit', get_string('alwaysedit', 'forum'), $options);
+        $mform->setDefault('alwaysedit', 0);
+        $mform->setHelpButton('alwaysedit', array('alwaysedit', get_string('alwaysedit', 'forum'), 'forum'));
+
         $options = array();
         $options[FORUM_TRACKING_OPTIONAL] = get_string('trackingoptional', 'forum');
         $options[FORUM_TRACKING_OFF] = get_string('trackingoff', 'forum');
