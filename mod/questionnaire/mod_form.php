@@ -57,8 +57,12 @@ class mod_questionnaire_mod_form extends moodleform_mod {
         $mform->addElement('select', 'qtype', get_string('qtype', 'questionnaire'), $QUESTIONNAIRE_TYPES);
         $mform->setHelpButton('qtype', array('qtype', get_string('qtype', 'questionnaire'), 'questionnaire'));
 
+        //HSU addition of patch for anonymous questionnaires - CONTRIB-2273
+        $mform->addElement('hidden', 'cannotchangerespondenttype');
         $mform->addElement('select', 'respondenttype', get_string('respondenttype', 'questionnaire'), $QUESTIONNAIRE_RESPONDENTS);
         $mform->setHelpButton('respondenttype', array('respondenttype', get_string('respondenttype', 'questionnaire'), 'questionnaire'));
+        //HSU addition of patch for anonymous questionnaires - CONTRIB-2273
+        $mform->disabledIf('respondenttype', 'cannotchangerespondenttype', 'eq', 1);
 
         $mform->addElement('static', 'old_resp_eligible', get_string('respondenteligible', 'questionnaire'),
                            get_string('respeligiblerepl', 'questionnaire'));
@@ -133,6 +137,17 @@ class mod_questionnaire_mod_form extends moodleform_mod {
             $default_values['useclosedate'] = 0;
         } else {
             $default_values['useclosedate'] = 1;
+        }
+
+        // prevent questionnaire set to "anonymous" to be reverted to "full name"
+        //HSU addition of patch for anonymous questionnaires - CONTRIB-2273
+        $default_values['cannotchangerespondenttype'] = 0;
+        if (!empty($default_values['respondenttype']) && $default_values['respondenttype'] == "anonymous") {
+            // if this questionnaire has responses
+            $numresp = count_records('questionnaire_response', 'survey_id', $default_values['sid'], '', '','complete', 'y');
+            if ($numresp) {
+                $default_values['cannotchangerespondenttype'] = 1;
+            }
         }
 
     }

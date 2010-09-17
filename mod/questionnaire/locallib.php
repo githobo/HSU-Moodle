@@ -2571,8 +2571,15 @@ class questionnaire {
             // get the response
             $response = $this->response_select_name($record->id, $choicecodes, $choicetext);
             $qid = $record->id;
-            //JR for better compabitility & readability with Excel
-            $submitted = date(get_string('strfdateformatcsv', 'questionnaire'), $record->submitted);
+            //HSU addition of patch for anonymous questionnaires - CONTRIB-2273
+            if ($isanonymous) {
+                // JR :: do not save response date for anonymous respondents
+                $submitted = '---';
+            } else {
+                //JR for better compabitility & readability with Excel
+                $submitted = date(get_string('strfdateformatcsv', 'questionnaire'), $record->submitted);
+            }
+            // end patch
             $institution = '';
             $department = '';
             $username  = $record->username;
