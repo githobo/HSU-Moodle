@@ -251,7 +251,7 @@
                     $form->error = get_string("attachmenterror", "block_quickmail", $form->attachment);
                 }
             } 
-			elseif($file['originalname']!='' && !$attachment_sucess){
+			elseif($file['originalname']!='' && !$attachment_success){
 				$form->error = get_string("attachmentmaxsize", "block_quickmail", $form->attachment);
 			}
 			else{
