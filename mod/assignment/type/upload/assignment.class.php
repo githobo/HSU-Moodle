@@ -1065,6 +1065,78 @@ class assignment_upload extends assignment_base {
 
     }
 
+    //HSU addition of patch for MDL-7206
+    function download_submissions() {
+        global $CFG;
+
+        $submissions = $this->get_submissions('','');
+        if (empty($submissions)) {
+            error("there are no submissions to download");
+        }
+
+        $filesforzipping = array();
+        $filesnewname = array();
+        $desttemp = "";
+
+        //create prefix of new filename
+        $filenewname = clean_filename($this->assignment->name. "_");
+        $course     = $this->course;
+        $assignment = $this->assignment;
+        $cm         = $this->cm;
+        $context    = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $groupmode = groups_get_activity_groupmode($cm);
+        $groupid = groups_get_activity_group($cm, true);
+        $count = 0;
+
+        foreach ($submissions as $submission) {
+            $a_userid = $submission->userid; //get userid
+            if ( (groups_is_member( $groupid,$a_userid)or !$groupmode or !$groupid)) {
+                $count = $count + 1;
+                $a_assignid = $submission->assignment; //get name of this assignment for use in the file names.
+                $a_user = get_complete_user_data("id", $a_userid); //get user
+                $filearea = $this->file_area_name($a_userid);
+                $desttemp = $CFG->dataroot . "/" . substr($filearea, 0, strrpos($filearea, "/")). "/temp/"; //get temp directory name
+
+                if (!file_exists($desttemp)) { //create temp dir if it doesn't already exist.
+                    mkdir($desttemp,0777,true); //can create a tree .........
+                }
+
+                if ($basedir = $this->file_area($a_userid)) {
+                    if ($files = get_directory_list($basedir)) {
+                        foreach ($files as $key => $file) {
+                            require_once($CFG->libdir.'/filelib.php');
+                            $filecleaned = clean_filename($file);  //remove any slashes
+                            //get files new name.
+                            $filesforzip = $desttemp . $a_user->username . "_" . $filenewname . "_" . $filecleaned;
+                            //get files old name
+                            $fileold = $CFG->dataroot . "/" . $filearea . "/" . $file;
+
+                            if (!copy($fileold, $filesforzip)) {
+                                error ("failed to copy file<br>" . $filesforzip . "<br>" .$fileold);
+                            }
+                            //save file name to array for zipping.
+                            $filesforzipping[] = $filesforzip;
+                        }
+                    }
+                }
+            }
+        }
+
+        //zip files
+        $filename = "assignment.zip"; //name of new zip file.
+        if ($count) zip_files($filesforzipping, $desttemp.$filename);
+
+        //delete old temp files
+        foreach ($filesforzipping as $filefor) {
+            unlink($filefor);
+        }
+
+        //send file to user.
+        if (file_exists($desttemp.$filename)) {
+            send_file($desttemp.$filename, $filename, 'default',0,false,true);
+        }
+    } //end patch
+
 }
 
 class mod_assignment_upload_notes_form extends moodleform {

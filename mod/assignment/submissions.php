@@ -6,6 +6,8 @@
     $id   = optional_param('id', 0, PARAM_INT);          // Course module ID
     $a    = optional_param('a', 0, PARAM_INT);           // Assignment ID
     $mode = optional_param('mode', 'all', PARAM_ALPHA);  // What mode are we in?
+    //HSU addition of patch for MDL-7206
+    $download = optional_param('download' , 'none', PARAM_ALPHA); //ZIP download asked for?
 
     if ($id) {
         if (! $cm = get_coursemodule_from_id('assignment', $id)) {
@@ -40,6 +42,11 @@
     $assignmentclass = 'assignment_'.$assignment->assignmenttype;
     $assignmentinstance = new $assignmentclass($cm->id, $assignment, $cm, $course);
 
-    $assignmentinstance->submissions($mode);   // Display or process the submissions
+    //HSU addition of patch for MDL-7206
+    if($download == "zip") {
+        $assignmentinstance->download_submissions();
+    } else {
+        $assignmentinstance->submissions($mode);   // Display or process the submissions
+    }
 
 ?>

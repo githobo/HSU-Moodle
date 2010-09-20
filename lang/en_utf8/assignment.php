@@ -140,5 +140,6 @@ $string['uploadsuccess'] = 'Uploaded \'$a\' successfully';
 $string['viewfeedback'] = 'View assignment grades and feedback';
 $string['viewsubmissions'] = 'View $a submitted assignments';
 $string['yoursubmission'] = 'Your submission';
+$string['zipanddownloadall'] = 'Zip & Download all submissions';    //HSU addition for MDL-7206
 
 ?>

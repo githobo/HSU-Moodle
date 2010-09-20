@@ -1338,6 +1338,15 @@ class assignment_base {
         }
         /// End of fast grading form
 
+        // print button offering zip file function to teacher
+        // HSU addition of patch for MDL-7206
+        $options["id"] = "$cm->id";
+        $options["download"] = "zip";
+        echo '<div align="center">';
+        print_single_button("submissions.php",$options, get_string('zipanddownloadall', 'assignment'));
+        echo '</div>';
+        //end patch
+
         /// Mini form for setting user preference
         echo '<div class="qgprefs">';
         echo '<form id="options" action="submissions.php?id='.$this->cm->id.'" method="post"><div>';
