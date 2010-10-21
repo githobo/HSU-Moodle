@@ -1006,93 +1006,129 @@ HTMLArea.prototype._wordClean = function() {
 
     var D = this.getInnerHTML();
     if (/[Mm]so/.test(D)) {
+        //HSU mod to do ajax call to purify_html
+        var xmlhttp;
+        try {
+            // Firefox, Opera 8.0+, Safari
+            xmlhttp = new XMLHttpRequest();
+        } catch (e) {
+            try {
+                //IE
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+                try {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (e) {
+                    // browser can't do ajax, revert to weaker method of cleaning word html
+                    // make one line
+                    D = D.replace(/\r\n/g, '\[br\]').
+                        replace(/\n/g, '').
+                        replace(/\r/g, '').
+                        replace(/\&nbsp\;/g,' ');
 
-        // make one line
-        D = D.replace(/\r\n/g, '\[br\]').
-            replace(/\n/g, '').
-            replace(/\r/g, '').
-            replace(/\&nbsp\;/g,' ');
+                    // keep tags, strip attributes
+                    D = D.replace(/ class=[^\s|>]*/gi,'').
+                        //replace(/<p [^>]*TEXT-ALIGN: justify[^>]*>/gi,'<p align="justify">').
+                        replace(/ style=\"[^>]*\"/gi,'').
+                        replace(/ align=[^\s|>]*/gi,'');
 
-        // keep tags, strip attributes
-        D = D.replace(/ class=[^\s|>]*/gi,'').
-            //replace(/<p [^>]*TEXT-ALIGN: justify[^>]*>/gi,'<p align="justify">').
-            replace(/ style=\"[^>]*\"/gi,'').
-            replace(/ align=[^\s|>]*/gi,'');
+                    //clean up tags
+                    D = D.replace(/<b [^>]*>/gi,'<b>').
+                        replace(/<i [^>]*>/gi,'<i>').
+                        replace(/<li [^>]*>/gi,'<li>').
+                        replace(/<ul [^>]*>/gi,'<ul>');
 
-        //clean up tags
-        D = D.replace(/<b [^>]*>/gi,'<b>').
-            replace(/<i [^>]*>/gi,'<i>').
-            replace(/<li [^>]*>/gi,'<li>').
-            replace(/<ul [^>]*>/gi,'<ul>');
+                    // replace outdated tags
+                    D = D.replace(/<b>/gi,'<strong>').
+                        replace(/<\/b>/gi,'</strong>');
 
-        // replace outdated tags
-        D = D.replace(/<b>/gi,'<strong>').
-            replace(/<\/b>/gi,'</strong>');
+                    // mozilla doesn't like <em> tags
+                    D = D.replace(/<em>/gi,'<i>').
+                        replace(/<\/em>/gi,'</i>');
 
-        // mozilla doesn't like <em> tags
-        D = D.replace(/<em>/gi,'<i>').
-            replace(/<\/em>/gi,'</i>');
+                    // kill unwanted tags
+                    D = D.replace(/<\?xml:[^>]*>/g, '').       // Word xml
+                        replace(/<\/?st1:[^>]*>/g,'').     // Word SmartTags
+                        replace(/<\/?[a-z]\:[^>]*>/g,'').  // All other funny Word non-HTML stuff
+                        replace(/<\/?personname[^>]*>/gi,'').
+                        replace(/<\/?font[^>]*>/gi,'').    // Disable if you want to keep font formatting
+                        replace(/<\/?span[^>]*>/gi,' ').
+                        replace(/<\/?div[^>]*>/gi,' ').
+                        replace(/<\/?pre[^>]*>/gi,' ').
+                        replace(/<(\/?)(h[1-6]+)[^>]*>/gi,'<$1$2>');
 
-        // kill unwanted tags
-        D = D.replace(/<\?xml:[^>]*>/g, '').       // Word xml
-            replace(/<\/?st1:[^>]*>/g,'').     // Word SmartTags
-            replace(/<\/?[a-z]\:[^>]*>/g,'').  // All other funny Word non-HTML stuff
-            replace(/<\/?personname[^>]*>/gi,'').
-            replace(/<\/?font[^>]*>/gi,'').    // Disable if you want to keep font formatting
-            replace(/<\/?span[^>]*>/gi,' ').
-            replace(/<\/?div[^>]*>/gi,' ').
-            replace(/<\/?pre[^>]*>/gi,' ').
-            replace(/<(\/?)(h[1-6]+)[^>]*>/gi,'<$1$2>');
+                    // Lorenzo Nicola's addition
+                    // to get rid off silly word generated tags.
+                    D = D.replace(/<!--\[[^\]]*\]-->/gi,' ');
 
-        // Lorenzo Nicola's addition
-        // to get rid off silly word generated tags.
-        D = D.replace(/<!--\[[^\]]*\]-->/gi,' ');
+                    //remove empty tags
+                    //D = D.replace(/<strong><\/strong>/gi,'').
+                    //replace(/<i><\/i>/gi,'').
+                    //replace(/<P[^>]*><\/P>/gi,'');
+                    D = D.replace(/<h[1-6]+>\s?<\/h[1-6]+>/gi, ''); // Remove empty headings
 
-        //remove empty tags
-        //D = D.replace(/<strong><\/strong>/gi,'').
-        //replace(/<i><\/i>/gi,'').
-        //replace(/<P[^>]*><\/P>/gi,'');
-        D = D.replace(/<h[1-6]+>\s?<\/h[1-6]+>/gi, ''); // Remove empty headings
+                    // nuke double tags
+                    oldlen = D.length + 1;
+                    while(oldlen > D.length) {
+                        oldlen = D.length;
+                        // join us now and free the tags, we'll be free hackers, we'll be free... ;-)
+                        D = D.replace(/<([a-z][a-z]*)> *<\/\1>/gi,' ').
+                            replace(/<([a-z][a-z]*)> *<([a-z][^>]*)> *<\/\1>/gi,'<$2>');
+                    }
+                    D = D.replace(/<([a-z][a-z]*)><\1>/gi,'<$1>').
+                        replace(/<\/([a-z][a-z]*)><\/\1>/gi,'<\/$1>');
 
-        // nuke double tags
-        oldlen = D.length + 1;
-        while(oldlen > D.length) {
-            oldlen = D.length;
-            // join us now and free the tags, we'll be free hackers, we'll be free... ;-)
-            D = D.replace(/<([a-z][a-z]*)> *<\/\1>/gi,' ').
-                replace(/<([a-z][a-z]*)> *<([a-z][^>]*)> *<\/\1>/gi,'<$2>');
-        }
-        D = D.replace(/<([a-z][a-z]*)><\1>/gi,'<$1>').
-            replace(/<\/([a-z][a-z]*)><\/\1>/gi,'<\/$1>');
+                    // nuke double spaces
+                    D = D.replace(/  */gi,' ');
 
-        // nuke double spaces
-        D = D.replace(/  */gi,' ');
+                    // Split into lines and remove
+                    // empty lines and add carriage returns back
+                    var splitter  = /\[br\]/g;
+                    var emptyLine = /^\s+\s+$/g;
+                    var strHTML   = '';
+                    var toLines   = D.split(splitter);
+                    for (var i = 0; i < toLines.length; i++) {
+                        var line = toLines[i];
+                        if (line.length < 1) {
+                            continue;
+                        }
 
-        // Split into lines and remove
-        // empty lines and add carriage returns back
-        var splitter  = /\[br\]/g;
-        var emptyLine = /^\s+\s+$/g;
-        var strHTML   = '';
-        var toLines   = D.split(splitter);
-        for (var i = 0; i < toLines.length; i++) {
-            var line = toLines[i];
-            if (line.length < 1) {
-                continue;
+                        if (emptyLine.test(line)) {
+                            continue;
+                        }
+
+                        line = line.replace(/^\s+\s+$/g, '');
+                        strHTML += line + '\n';
+                    }
+                    D = strHTML;
+                    strHTML = '';
+
+                    this.setHTML(D);
+                    this.updateToolbar();
+                }
             }
-
-            if (emptyLine.test(line)) {
-                continue;
-            }
-
-            line = line.replace(/^\s+\s+$/g, '');
-            strHTML += line + '\n';
         }
-        D = strHTML;
-        strHTML = '';
+        if (xmlhttp) {
+            basedir = location.pathname.split('/');
+            path = "/" + basedir[1] + "/lib/editor/htmlarea/purify_html.php";
 
-        this.setHTML(D);
-        this.updateToolbar();
-    }
+            var text = escape(this.getInnerHTML());
+            var obj = this;
+            xmlhttp.open("POST", path, true);
+
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.setRequestHeader("Content-length", text.length);
+            xmlhttp.setRequestHeader("Connection", "close");
+
+            xmlhttp.onreadystatechange=function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    obj.setHTML(xmlhttp.responseText);
+                    obj.updateToolbar();
+                }
+            }
+            xmlhttp.send("text=" + text);
+        }
+    } //end HSU mod
 };
 
 HTMLArea.prototype._unnestBlockWalk = function(node, unnestingParent) {
