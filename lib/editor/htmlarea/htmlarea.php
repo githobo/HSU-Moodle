@@ -1122,7 +1122,7 @@ HTMLArea.prototype._wordClean = function() {
 
             xmlhttp.onreadystatechange=function() {
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    obj.setHTML(xmlhttp.responseText);
+                    obj.setHTML(unescape(xmlhttp.responseText));
                     obj.updateToolbar();
                 }
             }
