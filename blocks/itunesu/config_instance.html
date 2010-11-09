@@ -1,0 +1,23 @@
+<table cellpadding="9" cellspacing="0">
+ <tr valign="top">
+ 	 <?php $this->config->text = $this->instance_revert_config_data($this->config); ?>
+     <td align="right"><?php print_string('configtitle', 'block_itunesu'); ?>:</td>
+     <td><input type="text" name="title" size="30" value="<?php echo !empty($this->config->title) ? $this->config->title : ''; ?>" /></td>
+ </tr>
+ <tr valign="top">
+     <td align="right">
+         <?php print_string('configcontent', 'block_itunesu'); ?>:
+     </td>
+     <td>
+         <?php print_textarea(false, 10, 50, 0, 0, 'text', $this->config->text); ?>
+         <br />
+         <i><?php print_string('configcontenthelp', 'block_itunesu'); ?></i>
+     </td>
+ </tr>
+ <tr>
+     <td colspan="2" align="center">
+         <input type="submit" value="<?php print_string('savechanges') ?>" />
+     </td>
+ </tr>
+</table>
+<?php use_html_editor(); ?>

@@ -1,0 +1,63 @@
+<table cellpadding="9" cellspacing="0">
+ <tr valign="top">
+     <td align="right">
+       <?php print_string('itunesurl', 'block_itunesu'); ?>:
+     </td>
+     <td>
+       <input type="text" name="block_itunesu_url" size="80" value="<?php echo isset($CFG->block_itunesu_url) ? $CFG->block_itunesu_url : ''; ?>" />
+     </td>
+ </tr>
+ <tr valign="top">
+     <td align="right">
+         <?php print_string('itunessitedomain', 'block_itunesu'); ?>:
+     </td>
+     <td>
+         <input type="text" name="block_itunesu_site_domain" size="80" value="<?php echo isset($CFG->block_itunesu_site_domain) ? $CFG->block_itunesu_site_domain : ''; ?>" />
+     </td>
+ </tr>
+ <tr valign="top">
+     <td align="right">
+         <?php print_string('itunessharedsecret', 'block_itunesu'); ?>:
+     </td>
+     <td>
+         <input type="text" name="block_itunesu_sharedsecret" size="80" value="<?php echo isset($CFG->block_itunesu_sharedsecret) ? $CFG->block_itunesu_sharedsecret : ''; ?>" />
+     </td>
+ </tr>
+ <tr valign="top">
+     <td align="right">
+         <?php print_string('itunesdebugsuffix', 'block_itunesu'); ?>:
+     </td>
+     <td>
+         <input type="text" name="block_itunesu_debugsuffix" size="80" value="<?php echo isset($CFG->block_itunesu_debugsuffix) ? $CFG->block_itunesu_debugsuffix : ''; ?>" />
+     </td>
+ </tr>
+ <tr valign="top">
+     <td align="right">
+         <?php print_string('itunesadmincred', 'block_itunesu'); ?>:
+     </td>
+     <td>
+         <input type="text" name="block_itunesu_admincred" size="80" value="<?php echo isset($CFG->block_itunesu_admincred) ? $CFG->block_itunesu_admincred : ''; ?>" />
+     </td>
+ </tr>
+ <tr valign="top">
+     <td align="right">
+         <?php print_string('itunesinsturctcred', 'block_itunesu'); ?>:
+     </td>
+     <td>
+         <input type="text" name="block_itunesu_insturctcred" size="80" value="<?php echo isset($CFG->block_itunesu_insturctcred) ? $CFG->block_itunesu_insturctcred : ''; ?>" />
+     </td>
+ </tr>
+ <tr valign="top">
+     <td align="right">
+         <?php print_string('itunesstudentcred', 'block_itunesu'); ?>:
+     </td>
+     <td>
+         <input type="text" name="block_itunesu_studentcred" size="80" value="<?php echo isset($CFG->block_itunesu_studentcred) ? $CFG->block_itunesu_studentcred : ''; ?>" />
+     </td>
+ </tr>
+ <tr>
+     <td colspan="2" align="center">
+         <input type="submit" value="<?php print_string('savechanges') ?>" />
+     </td>
+ </tr>
+ </table>
