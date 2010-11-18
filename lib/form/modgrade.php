@@ -58,7 +58,7 @@ class MoodleQuickForm_modgrade extends MoodleQuickForm_select{
                 if (!$this->_hidenograde) {
                     $grades[0] = get_string('nograde');
                 }
-                for ($i=100; $i>=1; $i--) {
+                for ($i=200; $i>=1; $i--) { //HSU mod to increase possible assignment point values to 200
                     $grades[$i] = $i;
                 }
                 $this->load($grades);

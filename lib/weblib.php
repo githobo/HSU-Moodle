@@ -5695,7 +5695,7 @@ function print_grade_menu($courseid, $name, $current, $includenograde=true, $ret
     if ($includenograde) {
         $grades[0] = get_string('nograde');
     }
-    for ($i=100; $i>=1; $i--) {
+    for ($i=200; $i>=1; $i--) {     //HSU mod to increase possible assignment point values to 200
         $grades[$i] = $i;
     }
     $output .= choose_from_menu($grades, $name, $current, '', '', 0, true);
